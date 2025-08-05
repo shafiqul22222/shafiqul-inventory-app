@@ -108,7 +108,8 @@
     </style>
 </head>
 <body>
-
+    
+    <!-- আপনার HTML এর বাকি অংশ অপরিবর্তিত আছে -->
     <div id="login-page">
         <div class="login-container">
             <img src="https://via.placeholder.com/150" alt="Shop Logo" class="shop-logo" id="login-page-logo">
@@ -132,7 +133,7 @@
     <div id="main-app">
         <header class="app-header no-print">
             <div class="header-title-container">
-                <span class="menu-toggle">&#9776;</span>
+                <span class="menu-toggle">☰</span>
                 <img id="header-logo" src="" alt="লোগো" style="display: none;">
                 <h1 id="shop-name-header">শফিকুল ইলেকট্রনিক কর্নার</h1>
             </div>
@@ -308,7 +309,7 @@
 
             <section id="computer-income" class="content-section"><h2 class="content-header">কম্পিউটার ইনকাম হিসাব</h2><div class="form-container"><form id="computer-income-form" class="form-grid"><div class="form-group"><label>তারিখ</label><input type="date" id="ci-date" readonly></div><div class="form-group"><label>কাজের নাম</label><select id="ci-work-name" required><option value="সার্ভে ইনকাম">সার্ভে ইনকাম</option><option value="অনলাইন ভিত্তিক">অনলাইন ভিত্তিক</option><option value="ছবি তোলা">ছবি তোলা</option><option value="ফটো কপি">ফটো কপি</option><option value="ল্যামোনেটিং">ল্যামোনেটিং</option><option value="প্রিন্ট">প্রিন্ট</option></select></div><div class="form-group"><label>টাকা</label><input type="number" id="ci-amount" required></div><div class="form-group" style="align-self: end;"><button type="submit" id="ci-submit-btn" class="btn btn-primary">ইনকাম যোগ</button></div></form></div><div class="table-container"><table id="ci-table"><thead><tr><th>তারিখ</th><th>কাজের নাম</th><th>টাকা</th><th>একশন</th></tr></thead><tbody></tbody></table></div></section>
             <section id="shop-account" class="content-section"><h2 class="content-header">দোকান হিসাব (খরচ)</h2><div class="form-container"><form id="shop-expense-form" class="form-grid"><div class="form-group"><label>তারিখ</label><input type="date" id="se-date" required></div><div class="form-group"><label>হিসাব ধরণ</label><select id="se-type" required><option value="দোকান ভাড়া">দোকান ভাড়া</option><option value="কারেন্ট বিল">কারেন্ট বিল</option><option value="অন্যান্য হিসাব">অন্যান্য হিসাব</option></select></div><div class="form-group"><label>টাকা</label><input type="number" id="se-amount" required></div><div class="form-group" style="align-self: end;"><button type="submit" id="se-submit-btn" class="btn btn-primary">খরচ যোগ</button></div></form></div><div class="table-container"><table id="se-table"><thead><tr><th>সিরিয়াল</th><th>তারিখ</th><th>হিসাব ধরণ</th><th>টাকা</th><th>একশন</th></tr></thead><tbody></tbody></table></div></section>
-            <section id="report" class="content-section"><h2 class="content-header">রিপোর্ট দেখুন</h2><div class="form-container"><form id="report-form" class="form-grid"><div class="form-group"><label>শুরুর তারিখ</label><input type="date" id="report-start-date" required></div><div class="form-group"><label>শেষের তারিখ</label><input type="date" id="report-end-date" required></div><div class="form-group" style="align-self: end;"><button type="submit" class="btn btn-primary">রিপোর্ট দেখুন</button><button type="button" id="print-report-btn" class="btn btn-warning" style="margin-left: 10px; display:none;">রিপোর্ট প্রিন্ট করুন</button></div></form></div><div id="report-output"><p>রিপোর্ট তৈরি করতে অনুগ্রহ করে তারিখ নির্বাচন করে "রিপোর্ট দেখুন" বাটনে ক্লিক করুন।</p></div></section>
+            <section id="report" class="content-section"><h2 class="content-header">রিপোর্ট দেখুন</h2><div class="form-container"><form id="report-form" class="form-grid"><div class="form-group"><label>שুরুর তারিখ</label><input type="date" id="report-start-date" required></div><div class="form-group"><label>শেষের তারিখ</label><input type="date" id="report-end-date" required></div><div class="form-group" style="align-self: end;"><button type="submit" class="btn btn-primary">রিপোর্ট দেখুন</button><button type="button" id="print-report-btn" class="btn btn-warning" style="margin-left: 10px; display:none;">রিপোর্ট প্রিন্ট করুন</button></div></form></div><div id="report-output"><p>রিপোর্ট তৈরি করতে অনুগ্রহ করে তারিখ নির্বাচন করে "রিপোর্ট দেখুন" বাটনে ক্লিক করুন।</p></div></section>
             <section id="profile" class="content-section"><h2 class="content-header">প্রোফাইল</h2><div class="profile-container form-container"><h3>দোকানের লোগো</h3><img id="logo-preview" src="https://via.placeholder.com/200" alt="লোগো প্রিভিউ"><input type="file" id="logo-upload" accept="image/*" style="margin-top: 15px;"></div></section>
             <section id="settings" class="content-section"><h2 class="content-header">সেটিংস</h2><div class="form-container"><h3>সাধারণ সেটিংস</h3><form id="general-settings-form" class="form-grid" style="margin-bottom: 30px;"><div class="form-group"><label for="shop-name">দোকানের নাম</label><input type="text" id="shop-name" required></div><div class="form-group"><label for="shop-address">দোকানের ঠিকানা</label><input type="text" id="shop-address" placeholder="গ্রাম, উপজেলা, জেলা"></div><div class="form-group"><label for="shop-mobile">মোবাইল নং</label><input type="tel" id="shop-mobile" placeholder="দোকানের মোবাইল নম্বর"></div><div class="form-group"><label for="shop-proprietor">প্রপাইটর এর নাম</label><input type="text" id="shop-proprietor" placeholder="মালিকের নাম"></div><div class="form-group" style="grid-column: 1 / -1; align-self: end; margin-top: 15px;"><button type="submit" class="btn btn-primary">সেটিংস সেভ করুন</button></div></form><h3>পাসওয়ার্ড পরিবর্তন</h3><form id="password-change-form" class="form-grid"><div class="form-group"><label>বর্তমান পাসওয়ার্ড</label><input type="password" id="current-password" required></div><div class="form-group"><label>নতুন পাসওয়ার্ড</label><input type="password" id="new-password" required></div><div class="form-group" style="align-self: end;"><button type="submit" class="btn btn-primary">পরিবর্তন করুন</button></div></form></div></section>
         </main>
@@ -335,7 +336,6 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const storage = firebase.storage();
         
         // Global variables
         let db = {
@@ -486,7 +486,7 @@
         
         function loadProductsPage() { 
             const tBody = document.querySelector('#product-table tbody'); tBody.innerHTML = ''; 
-            db.products.sort((a,b) => a.name.localeCompare(b.name)).forEach((p) => { 
+            db.products.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((p) => { 
                 const imageSrc = p.image || placeholderImage;
                 tBody.innerHTML += `<tr>
                     <td><img src="${imageSrc}" alt="${p.name}" class="table-product-image"></td>
@@ -500,37 +500,75 @@
             document.getElementById('product-image-preview').src = placeholderImage;
         }
 
-        function handleProductSubmit(e) { 
-            e.preventDefault(); 
-            const btn = document.getElementById('product-submit-btn'); btn.disabled = true;
+        // =========================================================================================
+        // ============== ছবি সেভ করার জন্য পরিবর্তিত ফাংশন (ImgBB ব্যবহার করে) ==============
+        // =========================================================================================
+        function handleProductSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('product-submit-btn');
+            btn.textContent = 'আপলোড হচ্ছে...';
+            btn.disabled = true;
+
             const name = document.getElementById('product-name').value.trim();
             const purchaseCost = parseFloat(document.getElementById('product-purchase-cost').value) || 0;
             const sellPrice = parseFloat(document.getElementById('product-sell-price').value) || 0;
             const initialStock = parseInt(document.getElementById('product-stock').value) || 0;
             const imageFile = document.getElementById('product-image').files[0];
-            
+
+            // ডাটা সেভ করার ফাংশন
             const saveProductData = (imageUrl) => {
-                const productData = { name, purchaseCost, sellPrice, initialStock, image: imageUrl !== undefined ? imageUrl : (editState.id ? db.products.find(p=>p.id===editState.id).image : null) };
+                const finalImageUrl = imageUrl !== undefined ? imageUrl : (editState.id ? db.products.find(p => p.id === editState.id).image : null);
+                const productData = { name, purchaseCost, sellPrice, initialStock, image: finalImageUrl, timestamp: firebase.database.ServerValue.TIMESTAMP };
+
                 let promise;
                 if (editState.key === 'products' && editState.id) {
                     promise = database.ref('products').child(editState.id).update(productData);
                 } else {
                     promise = database.ref('products').push(productData);
                 }
-                promise.then(() => { alert('পণ্য সফলভাবে সেভ হয়েছে!'); loadProductsPage(); }).catch(err => alert('ত্রুটি: ' + err.message));
+
+                promise.then(() => {
+                    alert('পণ্য সফলভাবে সেভ হয়েছে!');
+                    loadProductsPage();
+                }).catch(err => {
+                    alert('Firebase-এ তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message);
+                    btn.textContent = 'পণ্য যোগ করুন';
+                    btn.disabled = false;
+                });
             };
 
             if (imageFile) {
-                const uploadTask = storage.ref(`product_images/${Date.now()}_${imageFile.name}`).put(imageFile);
-                uploadTask.on('state_changed', (snapshot) => {}, 
-                    (error) => { alert('ছবি আপলোড করতে সমস্যা হয়েছে: ' + error); btn.disabled = false; }, 
-                    () => { uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => saveProductData(downloadURL)); }
-                );
+                // ImgBB API Key (আপনার দেওয়া Key এখানে বসানো হয়েছে)
+                const apiKey = '07a9c70579b89377dc931ef0fb35e0f4';
+
+                const formData = new FormData();
+                formData.append('image', imageFile);
+
+                // ImgBB তে ছবি আপলোড করার কোড
+                fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        const imageUrl = result.data.url; // ImgBB থেকে পাওয়া ছবির লিংক
+                        saveProductData(imageUrl);
+                    } else {
+                        throw new Error(result.error.message);
+                    }
+                })
+                .catch(error => {
+                    alert('ছবি আপলোড করতে সমস্যা হয়েছে: ' + error.message);
+                    btn.textContent = 'পণ্য যোগ করুন';
+                    btn.disabled = false;
+                });
             } else {
-                saveProductData(editState.id ? undefined : null);
+                saveProductData(undefined); // ছবি ছাড়া সেভ করুন ( undefined দিয়েছি যাতে এডিট করার সময় পুরোনো ছবি মুছে না যায়)
             }
         }
-        
+        // =========================================================================================
+
         function loadCustomersPage() { const tBody = document.querySelector('#customer-table tbody'); tBody.innerHTML = ''; db.customers.forEach((c, i) => { tBody.innerHTML += `<tr><td>${i+1}</td><td>${c.name}</td><td>${c.mobile}</td><td>${c.address || ''}</td><td><button class="action-btn edit-btn" onclick="editItem('customers', '${c.id}')">ইডিট</button><button class="action-btn delete-btn" onclick="deleteItem('customers', '${c.id}')">ডিলিট</button></td></tr>`; }); document.getElementById('customer-sl').value = db.customers.length + 1; resetForm(document.getElementById('customer-form'), document.getElementById('customer-submit-btn'), 'কাস্টমার যোগ'); }
         function handleCustomerSubmit(e) { e.preventDefault(); const btn = document.getElementById('customer-submit-btn'); btn.disabled = true; const newData = { name: document.getElementById('customer-name').value.trim(), mobile: document.getElementById('customer-mobile').value, address: document.getElementById('customer-address').value }; if (editState.key === 'customers') { database.ref('customers').child(editState.id).update(newData).then(() => {alert('কাস্টমার সফলভাবে আপডেট হয়েছে!'); loadCustomersPage();}); } else { database.ref('customers').push(newData).then(()=>{alert('কাস্টমার সফলভাবে যোগ হয়েছে!'); loadCustomersPage();}); } }
         
@@ -748,19 +786,24 @@
             } 
         }
         function loadProfilePage() { setAppLogo(db.shopInfo.logo); }
+        
         function handleLogoUpload(e) { 
             const file = e.target.files[0];
             if (!file) return;
-            const uploadTask = storage.ref(`logos/${db.shopInfo.name || "default"}_logo`).put(file);
-            uploadTask.on('state_changed', null, 
-                (error) => alert('লোগো আপলোড করতে সমস্যা হয়েছে: ' + error), 
-                () => {
-                    uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-                        database.ref('shopInfo/logo').set(downloadURL);
-                        alert('লোগো সফলভাবে আপলোড হয়েছে।');
-                    });
-                }
-            );
+            // আপনার দেওয়া Key এখানে বসানো হয়েছে
+            const apiKey = '07a9c70579b89377dc931ef0fb35e0f4';
+
+            const formData = new FormData();
+            formData.append('image', file);
+            fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(result => {
+                if(result.success){
+                    database.ref('shopInfo/logo').set(result.data.url);
+                    alert('লোগো সফলভাবে আপলোড হয়েছে।');
+                } else { throw new Error(result.error.message); }
+            })
+            .catch(error => alert('লোগো আপলোড করতে সমস্যা হয়েছে: ' + error.message));
         }
 
         function loadSettingsPage() {
