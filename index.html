@@ -10,8 +10,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
+    <!-- Chart.js লাইব্রেরি -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        /* --- CSS কোড অপরিবর্তিত আছে --- */
+        /* --- CSS কোড --- */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         :root {
             --primary-color: #3498db; --secondary-color: #2980b9; --dark-color: #2c3e50; --light-color: #ecf0f1;
@@ -49,8 +52,13 @@
         .app-header .logout-btn { background: var(--danger-color); color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; transition: background 0.3s; }
         .app-header .logout-btn:hover { background: #c0392b; }
         .app-nav { grid-area: nav; background: var(--dark-color); color: var(--white-color); transition: transform 0.3s ease-in-out; overflow-y: auto; display: flex; flex-direction: column; }
-        .app-nav ul { list-style: none; flex-grow: 1; margin-top: 20px;}
-        .app-nav ul li a { display: flex; align-items: center; color: #bdc3c7; padding: 16px 25px; text-decoration: none; transition: all 0.3s ease; border-left: 4px solid transparent; font-weight: 500; }
+        
+        /* --- পরিবর্তিত অংশ এখান থেকে শুরু --- */
+        .app-nav ul { list-style: none; flex-grow: 1; margin-top: 0; padding: 0; display: flex; flex-direction: column; }
+        .app-nav ul li { display: flex; flex-grow: 1; }
+        .app-nav ul li a { display: flex; align-items: center; color: #bdc3c7; padding: 16px 25px; text-decoration: none; transition: all 0.3s ease; border-left: 4px solid transparent; font-weight: 500; width: 100%; }
+        /* --- পরিবর্তিত অংশ এখানেই শেষ --- */
+
         .app-nav ul li a:hover { background: #34495e; color: var(--white-color); }
         .app-nav ul li a.active { background: var(--primary-color); color: var(--white-color); border-left-color: var(--warning-color); font-weight: 600; }
         .app-nav ul li a .nav-text { }
@@ -91,7 +99,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 0; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle;}
         th { background-color: #f8f9fa; color: var(--dark-color); text-transform: uppercase; font-size: 0.85rem; font-weight: 600; border-top: 1px solid var(--border-color);}
-        tr { transition: background-color 0.2s; }
+        tr:nth-child(even) { background-color: #fdfdfd; } /* Zebra striping for better readability */
         tr:last-child td { border-bottom: none; }
         tr:hover { background-color: rgba(52, 152, 219, 0.05); }
         .action-btn { padding: 6px 12px; margin-right: 5px; border: none; border-radius: 6px; cursor: pointer; color: white; font-size: 0.8rem;}
@@ -100,7 +108,8 @@
         .table-product-image { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
         #logo-preview { width: 150px; height: 150px; border: 3px dashed var(--border-color); border-radius: 50%; margin: 20px auto; display: block; object-fit: cover; }
         #product-image-preview { max-width: 150px; max-height: 150px; border: 2px dashed var(--border-color); border-radius: 8px; margin: 0 auto 20px auto; display: block; object-fit: cover; }
-        .pos-layout { display: grid; grid-template-columns: 2.5fr 1.5fr; gap: 25px; align-items: flex-start; }
+        
+        .pos-layout { display: grid; grid-template-columns: 1.5fr 2.5fr; gap: 25px; align-items: flex-start; }
         #pos-product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-height: 75vh; overflow-y: auto; background: var(--white-color); padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
         .pos-product-btn { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
         .pos-product-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--primary-color); }
@@ -110,10 +119,27 @@
         #pos-cart-table input[type="number"] { padding: 5px; text-align: center; }
         #pos-cart-table .delete-btn { padding: 5px 8px; }
         .pos-summary .form-group input { background: #f8f9fa; font-weight: bold; }
-        #pos-product-search { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-        @media (max-width: 1200px) { .pos-layout { grid-template-columns: 1.5fr 1fr; } }
-        @media (max-width: 992px) { .pos-layout { grid-template-columns: 1fr; } #pos-product-grid { max-height: 45vh; } }
-        @media (max-width: 768px) { #main-app { grid-template-columns: 1fr; grid-template-areas: "header" "content"; } .app-nav { position: fixed; left: 0; top: 0; width: 260px; height: 100vh; transform: translateX(-100%); z-index: 1000; box-shadow: 5px 0 20px rgba(0,0,0,0.1); } .app-nav.active { transform: translateX(0); } .app-header { z-index: 1001; position: relative; } .app-header .menu-toggle { display: block; margin-right: 15px; } .app-content { padding: 20px; } }
+
+        @media (max-width: 768px) {
+            #main-app { grid-template-columns: 1fr; grid-template-areas: "header" "content"; }
+            .app-nav { position: fixed; left: 0; top: 0; width: 260px; height: 100vh; transform: translateX(-100%); z-index: 1000; box-shadow: 5px 0 20px rgba(0,0,0,0.1); }
+            .app-nav.active { transform: translateX(0); }
+            .app-header { z-index: 1001; position: relative; }
+            .app-header .menu-toggle { display: block; margin-right: 15px; }
+            .app-content { padding: 20px; }
+            table thead { display: none; }
+            table, table tbody, table tr, table td { display: block; width: 100%; }
+            table tr { margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+            table td { text-align: right; padding-left: 50%; position: relative; border-bottom: 1px solid #eee; }
+            table td:last-child { border-bottom: none; }
+            table td::before { content: attr(data-label); position: absolute; left: 15px; width: calc(50% - 30px); text-align: left; font-weight: 600; color: var(--primary-color); }
+            .table-product-image { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); }
+            td[data-label="একশন"] { display: flex; justify-content: flex-end; align-items: center; }
+        }
+
+        @media (max-width: 1200px) { .pos-layout { grid-template-columns: 1fr 1.5fr; } }
+        @media (max-width: 992px) { .pos-layout { grid-template-columns: 1fr; } #pos-product-grid { max-height: 45vh; order: -1; } } /* Products first on small screens */
+        
         @media print { body * { visibility: hidden; } .print-area, .print-area * { visibility: visible; } .print-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; box-shadow: none; border: none; } .no-print { display: none; } }
     </style>
 </head>
@@ -168,10 +194,8 @@
                 <li><a href="#add-product" class="nav-link"><span>📦</span><span class="nav-text" data-lang-key="navAddProduct">পণ্য যোগ</span></a></li>
                 <li><a href="#add-supplier" class="nav-link"><span>🚚</span><span class="nav-text" data-lang-key="navAddSupplier">সাপ্লায়ার যোগ</span></a></li>
                 <li><a href="#add-customer" class="nav-link"><span>👥</span><span class="nav-text" data-lang-key="navAddCustomer">কাস্টমার যোগ</span></a></li>
-                <!-- নতুন ন্যাভিগেশন লিঙ্ক শুরু -->
                 <li><a href="#add-category" class="nav-link"><span>🗂️</span><span class="nav-text">ক্যাটাগরি</span></a></li>
                 <li><a href="#add-brand" class="nav-link"><span>🏷️</span><span class="nav-text">ব্রান্ড</span></a></li>
-                <!-- নতুন ন্যাভিগেশন লিঙ্ক শেষ -->
                 <li><a href="#stock" class="nav-link"><span>📝</span><span class="nav-text" data-lang-key="navStock">স্টক হিসাব</span></a></li>
                 <li><a href="#due-list" class="nav-link"><span>收款</span><span class="nav-text" data-lang-key="navDueList">বাকি তালিকা</span></a></li>
                 <li><a href="#mobile-finance" class="nav-link"><span>🏦</span><span class="nav-text" data-lang-key="navMobileFinance">মোবাইল ফাইন্যান্স</span></a></li>
@@ -189,10 +213,8 @@
         </nav>
         
         <main class="app-content">
-            <!-- All HTML sections are here -->
             <section id="dashboard" class="content-section">
                 <h2 class="content-header" data-lang-key="dashboardHeader">ড্যাসবোর্ড</h2>
-                
                 <div class="dashboard-filter-container no-print">
                     <button class="dashboard-filter-btn active" data-period="today">আজ</button>
                     <button class="dashboard-filter-btn" data-period="weekly">সাপ্তাহিক</button>
@@ -200,7 +222,6 @@
                     <button class="dashboard-filter-btn" data-period="yearly">বাৎসরিক</button>
                     <button class="dashboard-filter-btn" data-period="all">সর্বমোট</button>
                 </div>
-
                 <div class="dashboard-cards">
                     <div class="card c1"><div class="card-icon">💰</div><div class="card-content"><h3>আজকের বিক্রি</h3><p id="today-sale">০.০০</p></div></div>
                     <div class="card c2"><div class="card-icon">🛒</div><div class="card-content"><h3>আজকের ক্রয়</h3><p id="today-purchase">০.০০</p></div></div>
@@ -217,10 +238,7 @@
             <section id="pos-system" class="content-section">
                 <h2 class="content-header" data-lang-key="posHeader">পয়েন্ট অফ সেল (POS)</h2>
                 <div class="pos-layout">
-                    <div>
-                        <input type="text" id="pos-product-search" data-lang-placeholder="posSearchPlaceholder" placeholder="পণ্য খুঁজুন..." onkeyup="filterPosProducts()">
-                        <div id="pos-product-grid"></div>
-                    </div>
+                    <!-- বাম দিক: গ্রাহকের কার্ট এবং বিল -->
                     <div id="pos-cart-area">
                         <form id="pos-checkout-form">
                             <div class="form-group">
@@ -250,6 +268,23 @@
                                 <button type="button" id="pos-save-print-btn" class="btn btn-success" data-lang-key="posSavePrintBtn">সেভ ও প্রিন্ট</button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- ডান দিক: পণ্যের তালিকা -->
+                    <div>
+                        <div class="form-container" style="padding: 15px; margin-bottom: 20px;">
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; align-items: center;">
+                                <div class="form-group">
+                                    <label>ক্যাটাগরি</label>
+                                    <select id="pos-category-filter" onchange="filterAndDisplayPosProducts()"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>ব্রান্ড</label>
+                                    <select id="pos-brand-filter" onchange="filterAndDisplayPosProducts()"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="pos-product-grid"></div>
                     </div>
                 </div>
             </section>
@@ -286,10 +321,8 @@
                     <img id="product-image-preview" src="https://via.placeholder.com/150" alt="পণ্যের ছবির প্রিভিউ">
                     <form id="product-form" class="form-grid">
                         <div class="form-group"><label data-lang-key="productNameLabel">পণ্যের নাম</label><input type="text" id="product-name" required></div>
-                        <!-- পরিবর্তিত HTML কোড শুরু -->
                         <div class="form-group"><label>ক্যাটাগরি</label><select id="product-category"></select></div>
                         <div class="form-group"><label>ব্রান্ড</label><select id="product-brand"></select></div>
-                        <!-- পরিবর্তিত HTML কোড শেষ -->
                         <div class="form-group"><label data-lang-key="purchaseCostLabel">ক্রয় মূল্য</label><input type="number" id="product-purchase-cost" min="0" required></div>
                         <div class="form-group"><label data-lang-key="sellPriceLabel">বিক্রয় মূল্য</label><input type="number" id="product-sell-price" min="0" required></div>
                         <div class="form-group">
@@ -324,7 +357,6 @@
             <section id="add-supplier" class="content-section"><h2 class="content-header">নতুন সাপ্লায়ার যোগ করুন</h2><div class="form-container"><form id="supplier-form" class="form-grid"><div class="form-group"><label>সিরিয়াল</label><input type="text" id="supplier-sl" readonly></div><div class="form-group"><label>নাম</label><input type="text" id="supplier-name" required></div><div class="form-group"><label>মোবাইল</label><input type="tel" id="supplier-mobile"></div><div class="form-group" style="align-self: end;"><button type="submit" id="supplier-submit-btn" class="btn btn-primary">সাপ্লায়ার যোগ</button></div></form></div><div class="table-container"><table id="supplier-table"><thead><tr><th>সিরিয়াল</th><th>নাম</th><th>মোবাইল</th><th>একশন</th></tr></thead><tbody></tbody></table></div></section>
             <section id="add-customer" class="content-section"><h2 class="content-header">নতুন কাস্টমার যোগ করুন</h2><div class="form-container"><form id="customer-form" class="form-grid"><div class="form-group"><label>সিরিয়াল</label><input type="text" id="customer-sl" readonly></div><div class="form-group"><label>নাম</label><input type="text" id="customer-name" required></div><div class="form-group"><label>মোবাইল</label><input type="tel" id="customer-mobile"></div><div class="form-group"><label>ঠিকানা</label><input type="text" id="customer-address"></div><div class="form-group" style="align-self: end;"><button type="submit" id="customer-submit-btn" class="btn btn-primary">কাস্টমার যোগ</button></div></form></div><div class="table-container"><table id="customer-table"><thead><tr><th>সিরিয়াল</th><th>নাম</th><th>মোবাইল</th><th>ঠিকানা</th><th>একশন</th></tr></thead><tbody></tbody></table></div></section>
             
-            <!-- নতুন HTML সেকশন শুরু -->
             <section id="add-category" class="content-section">
                 <h2 class="content-header">ক্যাটাগরি ম্যানেজমেন্ট</h2>
                 <div class="form-container">
@@ -372,7 +404,6 @@
                     </table>
                 </div>
             </section>
-            <!-- নতুন HTML সেকশন শেষ -->
 
             <section id="stock" class="content-section"><h2 class="content-header">স্টক হিসাব</h2><div class="form-container" style="padding:15px; margin-bottom: 20px;"><input type="text" id="stock-search-input" onkeyup="filterTable('stock-table', 0)" placeholder="পণ্যের নাম দিয়ে খুঁজুন..."></div><div class="table-container"><table id="stock-table"><thead><tr><th>পণ্যের নাম</th><th>প্রাথমিক স্টক</th><th>মোট ক্রয়</th><th>মোট বিক্রয়</th><th>বর্তমান স্টক</th></tr></thead><tbody></tbody></table></div></section>
             <section id="due-list" class="content-section">
@@ -488,7 +519,35 @@
             </section>
             <section id="computer-income" class="content-section"><h2 class="content-header">কম্পিউটার ইনকাম হিসাব</h2><div class="form-container"><form id="computer-income-form" class="form-grid"><div class="form-group"><label>তারিখ</label><input type="date" id="ci-date" readonly></div><div class="form-group"><label>কাজের নাম</label><select id="ci-work-name" required><option value="সার্ভে ইনকাম">সার্ভে ইনকাম</option><option value="অনলাইন ভিত্তিক">অনলাইন ভিত্তিক</option><option value="ছবি তোলা">ছবি তোলা</option><option value="ফটো কপি">ফটো কপি</option><option value="ল্যামোনেটিং">ল্যামোনেটিং</option><option value="প্রিন্ট">প্রিন্ট</option></select></div><div class="form-group"><label>টাকা</label><input type="number" id="ci-amount" required></div><div class="form-group" style="align-self: end;"><button type="submit" id="ci-submit-btn" class="btn btn-primary">ইনকাম যোগ</button></div></form></div><div class="table-container"><table id="ci-table"><thead><tr><th>তারিখ</th><th>কাজের নাম</th><th>টাকা</th><th>একশন</th></tr></thead><tbody></tbody></table></div></section>
             <section id="shop-account" class="content-section"><h2 class="content-header">দোকান হিসাব (খরচ)</h2><div class="form-container"><form id="shop-expense-form" class="form-grid"><div class="form-group"><label>তারিখ</label><input type="date" id="se-date" required></div><div class="form-group"><label>হিসাব ধরণ</label><select id="se-type" required><option value="দোকান ভাড়া">দোকান ভাড়া</option><option value="কারেন্ট বিল">কারেন্ট বিল</option><option value="অন্যান্য হিসাব">অন্যান্য হিসাব</option></select></div><div class="form-group"><label>টাকা</label><input type="number" id="se-amount" required></div><div class="form-group" style="align-self: end;"><button type="submit" id="se-submit-btn" class="btn btn-primary">খরচ যোগ</button></div></form></div><div class="table-container"><table id="se-table"><thead><tr><th>সিরিয়াল</th><th>তারিখ</th><th>হিসাব ধরণ</th><th>টাকা</th><th>একশন</th></tr></thead><tbody></tbody></table></div></section>
-            <section id="report" class="content-section"><h2 class="content-header">রিপোর্ট দেখুন</h2><div class="form-container"><form id="report-form" class="form-grid"><div class="form-group"><label>শুরুর তারিখ</label><input type="date" id="report-start-date" required></div><div class="form-group"><label>শেষের তারিখ</label><input type="date" id="report-end-date" required></div><div class="form-group" style="align-self: end;"><button type="submit" class="btn btn-primary">রিপোর্ট দেখুন</button><button type="button" id="print-report-btn" class="btn btn-warning" style="margin-left: 10px; display:none;">রিপোর্ট প্রিন্ট করুন</button></div></form></div><div id="report-output"><p>রিপোর্ট তৈরি করতে অনুগ্রহ করে তারিখ নির্বাচন করে "রিপোর্ট দেখুন" বাটনে ক্লিক করুন।</p></div></section>
+            
+            <section id="report" class="content-section">
+                <h2 class="content-header">রিপোর্ট দেখুন</h2>
+                <div class="form-container no-print">
+                    <form id="report-form" class="form-grid">
+                        <div class="form-group"><label>শুরুর তারিখ</label><input type="date" id="report-start-date" required></div>
+                        <div class="form-group"><label>শেষের তারিখ</label><input type="date" id="report-end-date" required></div>
+                        <div class="form-group" style="align-self: end;">
+                            <button type="submit" class="btn btn-primary">রিপোর্ট দেখুন</button>
+                            <button type="button" id="print-report-btn" class="btn btn-warning" style="margin-left: 10px; display:none;">রিপোর্ট প্রিন্ট করুন</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="report-output">
+                    <p>রিপোর্ট তৈরি করতে অনুগ্রহ করে তারিখ নির্বাচন করে "রিপোর্ট দেখুন" বাটনে ক্লিক করুন।</p>
+                </div>
+                
+                <div id="report-charts-container" style="margin-top: 30px; display:none;">
+                    <div class="form-container">
+                         <h3 style="text-align:center; margin-bottom: 20px;">আয় বনাম ব্যয়ের রিপোর্ট</h3>
+                         <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                    <div class="form-container" style="margin-top: 20px;">
+                        <h3 style="text-align:center; margin-bottom: 20px;">সবচেয়ে বেশি বিক্রিত পণ্য</h3>
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
             <section id="profile" class="content-section"><h2 class="content-header">প্রোফাইল</h2><div class="profile-container form-container"><h3>দোকানের লোগো</h3><img id="logo-preview" src="https://via.placeholder.com/200" alt="লোগো প্রিভিউ"><input type="file" id="logo-upload" accept="image/*" style="margin-top: 15px;"></div></section>
             <section id="settings" class="content-section">
                 <h2 class="content-header">সেটিংস</h2>
@@ -508,6 +567,14 @@
                         <div class="form-group"><label>নতুন পাসওয়ার্ড</label><input type="password" id="new-password" required></div>
                         <div class="form-group" style="align-self: end;"><button type="submit" class="btn btn-primary">পরিবর্তন করুন</button></div>
                     </form>
+
+                    <!-- ✅ পরিবর্তন: বিপদজনক এলাকা (Dangerous Zone) যুক্ত করা হয়েছে -->
+                    <div id="danger-zone" style="margin-top: 40px; border-top: 2px solid var(--danger-color); padding-top: 20px; display: none;">
+                        <h3>বিপদজনক এলাকা</h3>
+                        <p style="margin-bottom: 15px;">এই বাটনে ক্লিক করলে ডাটাবেসের সমস্ত তথ্য (পণ্য, বিক্রি, কাস্টমার ইত্যাদি) স্থায়ীভাবে মুছে যাবে। এই কাজটি আর ফেরানো যাবে না।</p>
+                        <button id="delete-all-data-btn" class="btn" style="background-color: var(--danger-color); width: 100%;">সমস্ত ডেটা মুছে ফেলুন</button>
+                    </div>
+
                 </div>
             </section>
             <section id="user-management" class="content-section">
@@ -604,9 +671,6 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         
-        // ====================================================================================
-        // ========== YOUR FIREBASE CONFIGURATION IS PASTED HERE ==========
-        // ====================================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCIQv8TK8lxUaZNMG0PFG0meuVpvEfes78",
             authDomain: "shafiqul-inventory-app.firebaseapp.com",
@@ -617,12 +681,10 @@
             appId: "1:685781284453:web:d044a51e70e4b26d6a388c",
             measurementId: "G-2FWT2WZL61"
         };
-        // ====================================================================================
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // --- START: LANGUAGE AND GLOBAL VARS ---
         const translations = {
             editBtn: { bn: 'ইডিট', en: 'Edit' }, deleteBtn: { bn: 'ডিলিট', en: 'Delete' }, printBtn: { bn: 'প্রিন্ট', en: 'Print' },
             action: { bn: 'একশন', en: 'Action' }, saveBtn: { bn: 'সেভ করুন', en: 'Save' }, updateBtn: { bn: 'আপডেট করুন', en: 'Update' },
@@ -648,7 +710,7 @@
             dashTotalSuppliers: { bn: 'মোট সাপ্লায়ার', en: 'Total Suppliers' }, dashMonthlyExpense: { bn: 'চলতি মাসের খরচ', en: 'Current Month Expense' },
             dashComputerIncome: { bn: 'কম্পিউটার ইনকাম', en: 'Computer Income' }, dashMobileFinanceBalance: { bn: 'মোবাইল ফাইন্যান্স ব্যালেন্স', en: 'Mobile Finance Balance' },
             posHeader: { bn: 'পয়েন্ট অফ সেল (POS)', en: 'Point of Sale (POS)' },
-            posSearchPlaceholder: { bn: 'পণ্য খুঁজুন...', en: 'Search products...' }, posSavedCustomer: { bn: 'সেভ করা কাস্টমার', en: 'Saved Customer' },
+            posSearchPlaceholder: { bn: 'পণ্যের নাম লিখুন...', en: 'Type product name...' }, posSavedCustomer: { bn: 'সেভ করা কাস্টমার', en: 'Saved Customer' },
             posNewCustomer: { bn: 'অথবা, নতুন কাস্টমারের নাম', en: 'Or, New Customer Name' }, posNewCustomerPlaceholder: { bn: 'নতুন নাম লিখুন', en: 'Enter new name' },
             posTblProduct: { bn: 'পণ্য', en: 'Product' }, posTblQty: { bn: 'পরিমাণ', en: 'Quantity' },
             posTblPrice: { bn: 'মূল্য', en: 'Price' }, posTblAction: { bn: 'একশন', en: 'Action' },
@@ -690,7 +752,6 @@
             flexiloads: [], computerIncomes: [], shopExpenses: [], mobileFinances: [], flexiloadBalance: 0,
             users: [],
             units: [],
-            // নতুন ডাটা স্টোর
             categories: [],
             brands: [],
             templates: []
@@ -699,8 +760,9 @@
         let posCart = []; 
         let loggedInUser = null; 
         const placeholderImage = 'https://via.placeholder.com/150';
-
-        // --- START: CORE APP LOGIC ---
+        
+        let incomeExpenseChartInstance = null;
+        let topProductsChartInstance = null;
 
         const setLanguage = (lang) => {
             currentLanguage = lang;
@@ -758,7 +820,6 @@
                 if (db.shopInfo.logo && loginLogo) loginLogo.src = db.shopInfo.logo;
             });
 
-            // নতুন কালেকশন যোগ
             const collections = ['products', 'customers', 'suppliers', 'sales', 'purchases', 'flexiloads', 'computerIncomes', 'shopExpenses', 'users', 'units', 'templates', 'mobileFinances', 'categories', 'brands'];
             collections.forEach(key => {
                 database.ref(key).on('value', (snapshot) => {
@@ -791,7 +852,6 @@
             }));
             document.getElementById('language-selector').addEventListener('change', (e) => setLanguage(e.target.value));
 
-            // Delegate event listeners for forms to the main app container
             const mainApp = document.getElementById('main-app');
             mainApp.addEventListener('submit', function(e) {
                 const formHandlers = {
@@ -801,7 +861,6 @@
                     'password-change-form': handlePasswordChange, 'flexiload-form': handleFlexiloadSubmit, 'flexiload-balance-form': handleAddFlexiloadBalance,
                     'user-form': handleUserSubmit, 'unit-form': handleUnitSubmit, 'template-form': handleSmsTemplateSubmit,
                     'mobile-finance-form': handleMobileFinanceSubmit,
-                    // নতুন ফর্ম হ্যান্ডলার
                     'category-form': handleCategorySubmit,
                     'brand-form': handleBrandSubmit
                 };
@@ -815,6 +874,11 @@
                 };
                  if (clickHandlers[e.target.id]) { e.preventDefault(); clickHandlers[e.target.id](); }
                  
+                 // ✅ পরিবর্তন: ডেটা মোছার বাটনের জন্য ইভেন্ট লিসেনার
+                 if (e.target.id === 'delete-all-data-btn') {
+                    handleDeleteAllData();
+                 }
+
                  if (e.target.classList.contains('dashboard-filter-btn')) {
                     const period = e.target.dataset.period;
                     document.querySelectorAll('.dashboard-filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -847,8 +911,6 @@
             });
         }
         
-        // --- All original functions are below ---
-
         const getTodayDate = () => new Date().toISOString().split('T')[0];
         const resetForm = (formEl, btnEl, textKey) => { if(formEl) formEl.reset(); if(btnEl && translations[textKey]){ btnEl.textContent = translations[textKey][currentLanguage]; btnEl.className = 'btn btn-primary'; btnEl.disabled = false;} editState = { key: null, id: null }; };
         const getProductStock = (productId) => { 
@@ -886,7 +948,7 @@
                 }
             }
         };
-        const handleLogout = (e) => { e.preventDefault(); if (confirm('আপনি কি লগ আউট করতে চান?')) { loggedInUser = null; window.location.reload(); } };
+        const handleLogout = (e) => { if(e) e.preventDefault(); if (confirm('আপনি কি লগ আউট করতে চান?')) { loggedInUser = null; window.location.reload(); } };
         const navigateTo = (hash) => {
             if (!hash) hash = '#dashboard';
             if(hash.startsWith('#')) { window.location.hash = hash; }
@@ -897,7 +959,6 @@
             const appNav = document.querySelector('.app-nav');
             if (appNav.classList.contains('active')) appNav.classList.remove('active');
             
-            // নতুন পেজ লোডার যোগ
             const pageLoaders = { '#dashboard': loadDashboardData, '#pos-system': loadPosPage, '#pos-sales-list': loadPosSalesListPage, '#sell': loadSellPage, '#purchase': loadPurchasePage, '#add-product': loadProductsPage, '#add-supplier': loadSuppliersPage, '#add-customer': loadCustomersPage, '#stock': loadStockPage, '#due-list': loadDueListPage, '#mobile-finance': loadMobileFinancePage, '#flexiload': loadFlexiloadPage, '#computer-income': loadComputerIncomePage, '#shop-account': loadShopExpensePage, '#report': ()=>document.getElementById('report-form').reset(), '#profile': loadProfilePage, '#settings': loadSettingsPage, '#user-management': loadUserManagementPage, '#units': loadUnitsPage, '#add-category': loadCategoryPage, '#add-brand': loadBrandPage, '#sms-sender': loadSmsSenderPage, '#sms-templates': loadSmsTemplatesPage };
             if (pageLoaders[hash]) {
                 pageLoaders[hash]();
@@ -955,15 +1016,15 @@
             const tBody = document.querySelector('#product-table tbody'); tBody.innerHTML = ''; 
             db.products.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((p) => { 
                 tBody.innerHTML += `<tr>
-                    <td><img src="${p.image || placeholderImage}" alt="${p.name}" class="table-product-image"></td>
-                    <td>${p.name}</td>
-                    <td>${p.category || ''}</td>
-                    <td>${p.brand || ''}</td>
-                    <td>${(p.purchaseCost || 0).toFixed(2)}</td>
-                    <td>${(p.sellPrice || 0).toFixed(2)}</td>
-                    <td>${p.unit || 'N/A'}</td>
-                    <td>${p.initialStock || 0}</td>
-                    <td>
+                    <td data-label="ছবি"><img src="${p.image || placeholderImage}" alt="${p.name}" class="table-product-image"></td>
+                    <td data-label="পণ্যের নাম">${p.name}</td>
+                    <td data-label="ক্যাটাগরি">${p.category || ''}</td>
+                    <td data-label="ব্রান্ড">${p.brand || ''}</td>
+                    <td data-label="ক্রয় মূল্য">${(p.purchaseCost || 0).toFixed(2)}</td>
+                    <td data-label="বিক্রয় মূল্য">${(p.sellPrice || 0).toFixed(2)}</td>
+                    <td data-label="Unit">${p.unit || 'N/A'}</td>
+                    <td data-label="প্রাথমিক স্টক">${p.initialStock || 0}</td>
+                    <td data-label="একশন">
                         <button class="action-btn edit-btn" onclick="editItem('products', '${p.id}')">${translations.editBtn[currentLanguage]}</button>
                         <button class="action-btn delete-btn" onclick="deleteItem('products', '${p.id}')">${translations.deleteBtn[currentLanguage]}</button>
                     </td>
@@ -999,15 +1060,15 @@
             } else saveProductData(undefined);
         }
         
-        function loadCustomersPage() { const tBody = document.querySelector('#customer-table tbody'); tBody.innerHTML = ''; db.customers.forEach((c, i) => { tBody.innerHTML += `<tr><td>${i+1}</td><td>${c.name}</td><td>${c.mobile}</td><td>${c.address || ''}</td><td><button class="action-btn edit-btn" onclick="editItem('customers', '${c.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('customers', '${c.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); document.getElementById('customer-sl').value = db.customers.length + 1; resetForm(document.getElementById('customer-form'), document.getElementById('customer-submit-btn'), 'saveBtn'); }
+        function loadCustomersPage() { const tBody = document.querySelector('#customer-table tbody'); tBody.innerHTML = ''; db.customers.forEach((c, i) => { tBody.innerHTML += `<tr><td data-label="সিরিয়াল">${i+1}</td><td data-label="নাম">${c.name}</td><td data-label="মোবাইল">${c.mobile}</td><td data-label="ঠিকানা">${c.address || ''}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('customers', '${c.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('customers', '${c.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); document.getElementById('customer-sl').value = db.customers.length + 1; resetForm(document.getElementById('customer-form'), document.getElementById('customer-submit-btn'), 'saveBtn'); }
         function handleCustomerSubmit(e) { e.preventDefault(); const btn = document.getElementById('customer-submit-btn'); btn.disabled = true; const newData = { name: document.getElementById('customer-name').value.trim(), mobile: document.getElementById('customer-mobile').value, address: document.getElementById('customer-address').value }; if (editState.key === 'customers') { database.ref('customers').child(editState.id).update(newData).then(() => {alert('কাস্টমার সফলভাবে আপডেট হয়েছে!');}); } else { database.ref('customers').push(newData).then(()=>{alert('কাস্টমার সফলভাবে যোগ হয়েছে!');}); } }
-        function loadSuppliersPage() { const tBody = document.querySelector('#supplier-table tbody'); tBody.innerHTML = ''; db.suppliers.forEach((s, i) => { tBody.innerHTML += `<tr><td>${i+1}</td><td>${s.name}</td><td>${s.mobile}</td><td><button class="action-btn edit-btn" onclick="editItem('suppliers', '${s.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('suppliers', '${s.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); document.getElementById('supplier-sl').value = db.suppliers.length + 1; resetForm(document.getElementById('supplier-form'), document.getElementById('supplier-submit-btn'), 'saveBtn'); }
+        function loadSuppliersPage() { const tBody = document.querySelector('#supplier-table tbody'); tBody.innerHTML = ''; db.suppliers.forEach((s, i) => { tBody.innerHTML += `<tr><td data-label="সিরিয়াল">${i+1}</td><td data-label="নাম">${s.name}</td><td data-label="মোবাইল">${s.mobile}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('suppliers', '${s.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('suppliers', '${s.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); document.getElementById('supplier-sl').value = db.suppliers.length + 1; resetForm(document.getElementById('supplier-form'), document.getElementById('supplier-submit-btn'), 'saveBtn'); }
         function handleSupplierSubmit(e) { e.preventDefault(); const btn = document.getElementById('supplier-submit-btn'); btn.disabled = true; const newData = { name: document.getElementById('supplier-name').value.trim(), mobile: document.getElementById('supplier-mobile').value }; if (editState.key === 'suppliers') { database.ref('suppliers').child(editState.id).update(newData).then(()=>{alert('সাপ্লায়ার সফলভাবে আপডেট হয়েছে!');}); } else { database.ref('suppliers').push(newData).then(()=>{alert('সাপ্লায়ার সফলভাবে যোগ হয়েছে!');}); } }
-        function loadSellPage() { document.getElementById('sell-date').value = getTodayDate(); const customerSelect = document.getElementById('sell-customer'); customerSelect.innerHTML = '<option value="">কাস্টমার সিলেক্ট</option>'; db.customers.forEach(c => customerSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`); const productDatalist = document.getElementById('product-list'); productDatalist.innerHTML = ''; db.products.forEach(p => productDatalist.innerHTML += `<option value="${p.name}">`); const tBody = document.querySelector('#sell-table tbody'); tBody.innerHTML = ''; db.sales.filter(s => !s.isPosSale).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((s) => { tBody.innerHTML += `<tr><td>${s.date}</td><td>${s.customer}</td><td>${s.product}</td><td>${s.quantity}</td><td>${s.total.toFixed(2)}</td><td>${s.paid.toFixed(2)}</td><td>${s.due.toFixed(2)}</td><td><button class="action-btn delete-btn" onclick="deleteItem('sales', '${s.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('sell-form'), document.getElementById('sell-submit-btn'), 'saveBtn'); document.getElementById('sell-date').value = getTodayDate(); }
+        function loadSellPage() { document.getElementById('sell-date').value = getTodayDate(); const customerSelect = document.getElementById('sell-customer'); customerSelect.innerHTML = '<option value="">কাস্টমার সিলেক্ট</option>'; db.customers.forEach(c => customerSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`); const productDatalist = document.getElementById('product-list'); productDatalist.innerHTML = ''; db.products.forEach(p => productDatalist.innerHTML += `<option value="${p.name}">`); const tBody = document.querySelector('#sell-table tbody'); tBody.innerHTML = ''; db.sales.filter(s => !s.isPosSale).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((s) => { tBody.innerHTML += `<tr><td data-label="তারিখ">${s.date}</td><td data-label="কাস্টমার">${s.customer}</td><td data-label="পণ্য">${s.product}</td><td data-label="পরিমাণ">${s.quantity}</td><td data-label="মোট">${s.total.toFixed(2)}</td><td data-label="জমা">${s.paid.toFixed(2)}</td><td data-label="বাকি">${s.due.toFixed(2)}</td><td data-label="একশন"><button class="action-btn delete-btn" onclick="deleteItem('sales', '${s.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('sell-form'), document.getElementById('sell-submit-btn'), 'saveBtn'); document.getElementById('sell-date').value = getTodayDate(); }
         function handleSellSubmit(e) { e.preventDefault(); const productName = document.getElementById('sell-product-search').value; const quantityToSell = parseInt(document.getElementById('sell-quantity').value); const product = db.products.find(p => p.name === productName); if (!product) { alert('ত্রুটি: এই পণ্যটি তালিকায় নেই!'); return; } const stock = getProductStock(product.id); if(quantityToSell > stock){ alert(`দুঃখিত! এই পণ্যের যথেষ্ট স্টক নেই।\nবর্তমান স্টক: ${stock}`); return; } const btn = document.getElementById('sell-submit-btn'); btn.disabled = true; const newData = { date: document.getElementById('sell-date').value, customer: document.getElementById('sell-customer').value, product: productName, quantity: quantityToSell, total: parseFloat(document.getElementById('sell-total').value), paid: parseFloat(document.getElementById('sell-paid').value), due: parseFloat(document.getElementById('sell-due').value), isPosSale: false, timestamp: firebase.database.ServerValue.TIMESTAMP }; database.ref('sales').push(newData).then(() => { alert('বিক্রয় সফলভাবে যোগ হয়েছে!'); }); }
-        function loadPurchasePage() { document.getElementById('purchase-date').value = getTodayDate(); const supplierSelect = document.getElementById('purchase-supplier'); supplierSelect.innerHTML = '<option value="">সাপ্লায়ার সিলেক্ট</option>'; db.suppliers.forEach(s => supplierSelect.innerHTML += `<option value="${s.name}">${s.name}</option>`); const productSelect = document.getElementById('purchase-product'); productSelect.innerHTML = '<option value="">পণ্য সিলেক্ট</option>'; db.products.forEach(p => productSelect.innerHTML += `<option value="${p.name}">${p.name}</option>`); const tBody = document.querySelector('#purchase-table tbody'); tBody.innerHTML = ''; db.purchases.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((p) => { tBody.innerHTML += `<tr><td>${p.date}</td><td>${p.supplier}</td><td>${p.product}</td><td>${p.quantity}</td><td>${p.total.toFixed(2)}</td><td>${p.paid.toFixed(2)}</td><td>${p.due.toFixed(2)}</td><td><button class="action-btn edit-btn" onclick="editItem('purchases', '${p.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('purchases', '${p.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('purchase-form'), document.getElementById('purchase-submit-btn'), 'saveBtn'); document.getElementById('purchase-date').value = getTodayDate(); }
+        function loadPurchasePage() { document.getElementById('purchase-date').value = getTodayDate(); const supplierSelect = document.getElementById('purchase-supplier'); supplierSelect.innerHTML = '<option value="">সাপ্লায়ার সিলেক্ট</option>'; db.suppliers.forEach(s => supplierSelect.innerHTML += `<option value="${s.name}">${s.name}</option>`); const productSelect = document.getElementById('purchase-product'); productSelect.innerHTML = '<option value="">পণ্য সিলেক্ট</option>'; db.products.forEach(p => productSelect.innerHTML += `<option value="${p.name}">${p.name}</option>`); const tBody = document.querySelector('#purchase-table tbody'); tBody.innerHTML = ''; db.purchases.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((p) => { tBody.innerHTML += `<tr><td data-label="তারিখ">${p.date}</td><td data-label="সাপ্লায়ার">${p.supplier}</td><td data-label="পণ্য">${p.product}</td><td data-label="পরিমাণ">${p.quantity}</td><td data-label="মোট">${p.total.toFixed(2)}</td><td data-label="জমা">${p.paid.toFixed(2)}</td><td data-label="বাকি">${p.due.toFixed(2)}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('purchases', '${p.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('purchases', '${p.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('purchase-form'), document.getElementById('purchase-submit-btn'), 'saveBtn'); document.getElementById('purchase-date').value = getTodayDate(); }
         function handlePurchaseSubmit(e) { e.preventDefault(); const btn = document.getElementById('purchase-submit-btn'); btn.disabled = true; const newData = { date: document.getElementById('purchase-date').value, supplier: document.getElementById('purchase-supplier').value, product: document.getElementById('purchase-product').value, quantity: parseInt(document.getElementById('purchase-quantity').value), price: parseFloat(document.getElementById('purchase-price').value), total: parseFloat(document.getElementById('purchase-total').value), paid: parseFloat(document.getElementById('purchase-paid').value), due: parseFloat(document.getElementById('purchase-due').value), timestamp: firebase.database.ServerValue.TIMESTAMP }; if(editState.key === 'purchases') { database.ref('purchases').child(editState.id).update(newData).then(() => { alert('ক্রয় সফলভাবে আপডেট হয়েছে!'); }); } else { database.ref('purchases').push(newData).then(() => { alert('ক্রয় সফলভাবে সেভ হয়েছে!'); }); } }
-        function loadStockPage(){ const tBody = document.querySelector('#stock-table tbody'); tBody.innerHTML = ''; db.products.forEach(product => { const currentStock = getProductStock(product.id); const purchased = db.purchases.filter(p => p.product === product.name).reduce((sum, p) => sum + p.quantity, 0); const sold = db.sales.filter(s => s.product === product.name && !s.isPaymentRecord).reduce((sum, s) => sum + s.quantity, 0); tBody.innerHTML += `<tr><td>${product.name}</td><td>${product.initialStock || 0}</td><td>${purchased}</td><td>${sold}</td><td>${currentStock}</td></tr>`; }); }
+        function loadStockPage(){ const tBody = document.querySelector('#stock-table tbody'); tBody.innerHTML = ''; db.products.forEach(product => { const currentStock = getProductStock(product.id); const purchased = db.purchases.filter(p => p.product === product.name).reduce((sum, p) => sum + p.quantity, 0); const sold = db.sales.filter(s => s.product === product.name && !s.isPaymentRecord).reduce((sum, s) => sum + s.quantity, 0); tBody.innerHTML += `<tr><td data-label="পণ্যের নাম">${product.name}</td><td data-label="প্রাথমিক স্টক">${product.initialStock || 0}</td><td data-label="মোট ক্রয়">${purchased}</td><td data-label="মোট বিক্রয়">${sold}</td><td data-label="বর্তমান স্টক">${currentStock}</td></tr>`; }); }
         function loadDueListPage() {
             const tBody = document.querySelector('#due-list-table tbody'); tBody.innerHTML = '';
             const customerDues = {};
@@ -1018,7 +1079,7 @@
             let serial = 1;
             for (const customerName in customerDues) {
                 const customerId = customerDues[customerName].id;
-                tBody.innerHTML += `<tr><td>${serial}</td><td>${customerName}</td><td>${customerDues[customerName].due.toFixed(2)}</td><td><button class="action-btn btn-info" onclick="collectDue('${customerName}')">টাকা জমা</button><button class="action-btn btn-success" onclick="sendDueReminderSms('${customerId}')" ${!customerId ? 'disabled' : ''}>SMS পাঠান</button></td></tr>`;
+                tBody.innerHTML += `<tr><td data-label="সিরিয়াল">${serial}</td><td data-label="কাস্টমারের নাম">${customerName}</td><td data-label="মোট বাকি">${customerDues[customerName].due.toFixed(2)}</td><td data-label="একশন"><button class="action-btn btn-info" onclick="collectDue('${customerName}')">টাকা জমা</button><button class="action-btn btn-success" onclick="sendDueReminderSms('${customerId}')" ${!customerId ? 'disabled' : ''}>SMS পাঠান</button></td></tr>`;
                 serial++;
             }
         }
@@ -1033,11 +1094,11 @@
         };
         window.deleteFlexiload = (id) => { if (confirm('আপনি কি এই এন্ট্রিটি ডিলিট করতে চান? ডিলিট করলে রিচার্জ ও কমিশনের টাকা ফেরত আসবে।')) { const item = db.flexiloads.find(f=>f.id === id); if(item) { const newBalance = db.flexiloadBalance + item.amount - item.commission; database.ref('flexiloadBalance').set(newBalance); database.ref('flexiloads').child(id).remove(); } } };
         function handleAddFlexiloadBalance(e) { e.preventDefault(); const amountToAdd = parseFloat(document.getElementById('flexiload-add-balance-amount').value); if(isNaN(amountToAdd) || amountToAdd <= 0) { alert('অনুগ্রহ করে সঠিক পরিমাণ লিখুন।'); return; } database.ref('flexiloadBalance').set(db.flexiloadBalance + amountToAdd).then(() => { alert(`সফলভাবে ${amountToAdd.toFixed(2)} টাকা ব্যালেন্সে যোগ করা হয়েছে।`); document.getElementById('flexiload-balance-form').reset(); }); }
-        function loadFlexiloadPage() { document.getElementById('flexiload-current-balance').textContent = db.flexiloadBalance.toFixed(2); const tBody = document.querySelector('#flexiload-table tbody'); tBody.innerHTML = ''; db.flexiloads.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((item, i) => { tBody.innerHTML += `<tr><td>${i+1}</td><td>${item.mobile}</td><td>${item.amount.toFixed(2)}</td><td>${(item.commission || 0).toFixed(2)}</td><td>${item.status}</td><td><button class="action-btn delete-btn" onclick="deleteFlexiload('${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('flexiload-form'), document.getElementById('flexiload-submit-btn'), 'saveBtn'); }
+        function loadFlexiloadPage() { document.getElementById('flexiload-current-balance').textContent = db.flexiloadBalance.toFixed(2); const tBody = document.querySelector('#flexiload-table tbody'); tBody.innerHTML = ''; db.flexiloads.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((item, i) => { tBody.innerHTML += `<tr><td data-label="সিরিয়াল">${i+1}</td><td data-label="মোবাইল">${item.mobile}</td><td data-label="টাকা">${item.amount.toFixed(2)}</td><td data-label="কমিশন">${(item.commission || 0).toFixed(2)}</td><td data-label="স্ট্যাটাস">${item.status}</td><td data-label="একশন"><button class="action-btn delete-btn" onclick="deleteFlexiload('${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('flexiload-form'), document.getElementById('flexiload-submit-btn'), 'saveBtn'); }
         function handleFlexiloadSubmit(e) { e.preventDefault(); const amount = parseFloat(document.getElementById('flexiload-amount').value); const commission = parseFloat(document.getElementById('flexiload-commission').value) || 0; const status = document.getElementById('flexiload-status').value; if (status === 'Success' && db.flexiloadBalance < amount) { alert(`রিচার্জ সম্ভব নয়। আপনার বর্তমান ব্যালেন্স (${db.flexiloadBalance.toFixed(2)}) অপর্যাপ্ত।`); return; } const btn = document.getElementById('flexiload-submit-btn'); btn.disabled = true; const newData = { mobile: document.getElementById('flexiload-mobile').value, amount: amount, commission: commission, status: status, timestamp: firebase.database.ServerValue.TIMESTAMP }; database.ref('flexiloads').push(newData).then(() => { if (status === 'Success') { database.ref('flexiloadBalance').set(db.flexiloadBalance - amount + commission); } }); }
-        function loadComputerIncomePage() { const tBody = document.querySelector('#ci-table tbody'); tBody.innerHTML = ''; db.computerIncomes.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((item) => { tBody.innerHTML += `<tr><td>${item.date}</td><td>${item.work}</td><td>${item.amount.toFixed(2)}</td><td><button class="action-btn delete-btn" onclick="deleteItem('computerIncomes', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('computer-income-form'), document.getElementById('ci-submit-btn'), 'saveBtn'); document.getElementById('ci-date').value = getTodayDate(); }
+        function loadComputerIncomePage() { const tBody = document.querySelector('#ci-table tbody'); tBody.innerHTML = ''; db.computerIncomes.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((item) => { tBody.innerHTML += `<tr><td data-label="তারিখ">${item.date}</td><td data-label="কাজের নাম">${item.work}</td><td data-label="টাকা">${item.amount.toFixed(2)}</td><td data-label="একশন"><button class="action-btn delete-btn" onclick="deleteItem('computerIncomes', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('computer-income-form'), document.getElementById('ci-submit-btn'), 'saveBtn'); document.getElementById('ci-date').value = getTodayDate(); }
         function handleComputerIncomeSubmit(e) { e.preventDefault(); const btn = document.getElementById('ci-submit-btn'); btn.disabled = true; const newData = { date: document.getElementById('ci-date').value, work: document.getElementById('ci-work-name').value, amount: parseFloat(document.getElementById('ci-amount').value), timestamp: firebase.database.ServerValue.TIMESTAMP }; database.ref('computerIncomes').push(newData).then(() => { document.getElementById('computer-income-form').reset(); document.getElementById('ci-date').value = getTodayDate(); }); }
-        function loadShopExpensePage() { const tBody = document.querySelector('#se-table tbody'); tBody.innerHTML = ''; db.shopExpenses.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((item, i) => { tBody.innerHTML += `<tr><td>${i + 1}</td><td>${item.date}</td><td>${item.type}</td><td>${item.amount.toFixed(2)}</td><td><button class="action-btn delete-btn" onclick="deleteItem('shopExpenses', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('shop-expense-form'), document.getElementById('se-submit-btn'), 'saveBtn'); }
+        function loadShopExpensePage() { const tBody = document.querySelector('#se-table tbody'); tBody.innerHTML = ''; db.shopExpenses.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach((item, i) => { tBody.innerHTML += `<tr><td data-label="সিরিয়াল">${i + 1}</td><td data-label="তারিখ">${item.date}</td><td data-label="হিসাব ধরণ">${item.type}</td><td data-label="টাকা">${item.amount.toFixed(2)}</td><td data-label="একশন"><button class="action-btn delete-btn" onclick="deleteItem('shopExpenses', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('shop-expense-form'), document.getElementById('se-submit-btn'), 'saveBtn'); }
         function handleShopExpenseSubmit(e) { e.preventDefault(); const btn = document.getElementById('se-submit-btn'); btn.disabled = true; const newData = { date: document.getElementById('se-date').value, type: document.getElementById('se-type').value, amount: parseFloat(document.getElementById('se-amount').value), timestamp: firebase.database.ServerValue.TIMESTAMP }; database.ref('shopExpenses').push(newData).then(() => { document.getElementById('shop-expense-form').reset(); }); }
         
         function loadMobileFinancePage() {
@@ -1045,12 +1106,12 @@
             tBody.innerHTML = '';
             db.mobileFinances.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)).forEach(item => {
                 tBody.innerHTML += `<tr>
-                    <td>${item.date}</td>
-                    <td>${item.type}</td>
-                    <td>${item.service}</td>
-                    <td>${item.amount.toFixed(2)}</td>
-                    <td>${item.description || ''}</td>
-                    <td>
+                    <td data-label="তারিখ">${item.date}</td>
+                    <td data-label="ধরণ">${item.type}</td>
+                    <td data-label="সার্ভিস">${item.service}</td>
+                    <td data-label="টাকা">${item.amount.toFixed(2)}</td>
+                    <td data-label="বিবরণ">${item.description || ''}</td>
+                    <td data-label="একশন">
                         <button class="action-btn edit-btn" onclick="editItem('mobileFinances', '${item.id}')">${translations.editBtn[currentLanguage]}</button>
                         <button class="action-btn delete-btn" onclick="deleteItem('mobileFinances', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button>
                     </td>
@@ -1088,31 +1149,41 @@
             });
         }
 
-        window.filterPosProducts = () => { const filter = document.getElementById('pos-product-search').value.toUpperCase(); const grid = document.getElementById('pos-product-grid'); const products = grid.getElementsByClassName('pos-product-btn'); for (let i = 0; i < products.length; i++) { let h4 = products[i].getElementsByTagName('h4')[0]; if (h4) { if (h4.textContent.toUpperCase().indexOf(filter) > -1) { products[i].style.display = "flex"; } else { products[i].style.display = "none"; } } } };
-        function loadPosPage() {
-            editState = { key: null, id: null }; document.getElementById('pos-product-search').value = '';
+        window.filterAndDisplayPosProducts = () => {
+            const categoryFilter = document.getElementById('pos-category-filter').value;
+            const brandFilter = document.getElementById('pos-brand-filter').value;
+            let filteredProducts = db.products;
+            if (categoryFilter) { filteredProducts = filteredProducts.filter(p => p.category === categoryFilter); }
+            if (brandFilter) { filteredProducts = filteredProducts.filter(p => p.brand === brandFilter); }
             const grid = document.getElementById('pos-product-grid'); grid.innerHTML = '';
-            db.products.forEach(p => { grid.innerHTML += `<div class="pos-product-btn" onclick="addToPosCart('${p.id}')"><img src="${p.image || placeholderImage}" alt="${p.name}"><h4>${p.name}</h4><p>${(p.sellPrice || 0).toFixed(2)}</p></div>`; });
-            const customerSelect = document.getElementById('pos-customer-saved'); customerSelect.innerHTML = `<option value="">-- ${currentLanguage === 'bn' ? 'কাস্টমার সিলেক্ট' : 'Select Customer'} --</option>`;
-            db.customers.forEach(c => { customerSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
-            document.getElementById('pos-checkout-form').reset(); posCart = []; handleCustomerSelection();
-            document.getElementById('pos-save-btn').textContent = translations.posSaveBtn[currentLanguage];
-            document.getElementById('pos-save-print-btn').textContent = translations.posSavePrintBtn[currentLanguage];
+            if (filteredProducts.length === 0) { grid.innerHTML = '<p style="text-align: center; padding: 20px; color: #888;">এই ফিল্টারে কোনো পণ্য পাওয়া যায়নি।</p>'; return; }
+            filteredProducts.forEach(p => { const stock = getProductStock(p.id); const isOutOfStock = stock <= 0; grid.innerHTML += `<div class="pos-product-btn" onclick="${isOutOfStock ? "alert('এই পণ্যটি স্টক আউট!')" : `addToPosCart('${p.id}')`}" style="${isOutOfStock ? 'opacity: 0.5; cursor: not-allowed;' : ''}"><img src="${p.image || placeholderImage}" alt="${p.name}"><h4>${p.name}</h4><p>${(p.sellPrice || 0).toFixed(2)}</p><span style="font-size: 11px; font-weight: bold; color: ${isOutOfStock ? 'var(--danger-color)' : 'var(--success-color)'};">স্টক: ${stock}</span></div>`; });
         }
+        
+        function loadPosPage() {
+            editState = { key: null, id: null };
+            const categorySelect = document.getElementById('pos-category-filter'); categorySelect.innerHTML = '<option value="">সকল ক্যাটাগরি</option>'; db.categories.forEach(cat => { categorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
+            const brandSelect = document.getElementById('pos-brand-filter'); brandSelect.innerHTML = '<option value="">সকল ব্রান্ড</option>'; db.brands.forEach(br => { brandSelect.innerHTML += `<option value="${br.name}">${br.name}</option>`; });
+            const customerSelect = document.getElementById('pos-customer-saved'); customerSelect.innerHTML = `<option value="">-- ${currentLanguage === 'bn' ? 'কাস্টমার সিলেক্ট' : 'Select Customer'} --</option>`; db.customers.forEach(c => { customerSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
+            filterAndDisplayPosProducts();
+            document.getElementById('pos-checkout-form').reset(); posCart = []; handleCustomerSelection();
+            document.getElementById('pos-save-btn').textContent = translations.posSaveBtn[currentLanguage]; document.getElementById('pos-save-print-btn').textContent = translations.posSavePrintBtn[currentLanguage];
+        }
+
         function loadPosSalesListPage() {
             const tBody = document.querySelector('#pos-sales-table tbody'); tBody.innerHTML = ''; 
             const posSales = db.sales.filter(s => s.isPosSale && s.isPaymentRecord).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); 
             posSales.forEach(sale => { 
                 tBody.innerHTML += `<tr>
-                    <td>${sale.invoiceId.slice(-6)}</td>
-                    <td>${sale.date}</td>
-                    <td>${sale.customer}</td>
-                    <td>${sale.sellerName || 'N/A'}</td>
-                    <td>${sale.total.toFixed(2)}</td>
-                    <td>${(sale.discount || 0).toFixed(2)}</td>
-                    <td>${sale.paid.toFixed(2)}</td>
-                    <td>${sale.due.toFixed(2)}</td>
-                    <td>
+                    <td data-label="ইনভয়েস নং">${sale.invoiceId.slice(-6)}</td>
+                    <td data-label="তারিখ">${sale.date}</td>
+                    <td data-label="কাস্টমার">${sale.customer}</td>
+                    <td data-label="বিক্রয়কারী">${sale.sellerName || 'N/A'}</td>
+                    <td data-label="মোট">${sale.total.toFixed(2)}</td>
+                    <td data-label="ছাড়">${(sale.discount || 0).toFixed(2)}</td>
+                    <td data-label="পরিশোধিত">${sale.paid.toFixed(2)}</td>
+                    <td data-label="বাকি">${sale.due.toFixed(2)}</td>
+                    <td data-label="একশন">
                         <button class="action-btn btn-info" onclick="reprintInvoice('${sale.invoiceId}')">${translations.printBtn[currentLanguage]}</button>
                         <button class="action-btn edit-btn" onclick="editPosSale('${sale.invoiceId}')">${translations.editBtn[currentLanguage]}</button>
                         <button class="action-btn delete-btn" onclick="deletePosSale('${sale.invoiceId}')">${translations.deleteBtn[currentLanguage]}</button>
@@ -1120,20 +1191,12 @@
                 </tr>`; 
             }); 
         }
-        window.deletePosSale = (invoiceId) => {
-            if (confirm('আপনি কি নিশ্চিতভাবে এই বিক্রয়টি ডিলিট করতে চান? এর সাথে সম্পর্কিত সকল তথ্য মুছে যাবে।')) {
-                const updates = {}; db.sales.forEach(sale => { if (sale.invoiceId === invoiceId) { updates[sale.id] = null; } });
-                database.ref('sales').update(updates).then(() => alert('বিক্রয় সফলভাবে ডিলিট করা হয়েছে।')).catch(err => alert('ডিলিট করতে সমস্যা হয়েছে: ' + err.message));
-            }
-        };
+        window.deletePosSale = (invoiceId) => { if (confirm('আপনি কি নিশ্চিতভাবে এই বিক্রয়টি ডিলিট করতে চান? এর সাথে সম্পর্কিত সকল তথ্য মুছে যাবে।')) { const updates = {}; db.sales.forEach(sale => { if (sale.invoiceId === invoiceId) { updates[sale.id] = null; } }); database.ref('sales').update(updates).then(() => alert('বিক্রয় সফলভাবে ডিলিট করা হয়েছে।')).catch(err => alert('ডিলিট করতে সমস্যা হয়েছে: ' + err.message)); } };
         window.editPosSale = (invoiceId) => {
             const masterSale = db.sales.find(s => s.invoiceId === invoiceId && s.isPaymentRecord); if (!masterSale) { alert("বিক্রয় খুঁজে পাওয়া যায়নি!"); return; }
             editState = { key: 'posSale', id: invoiceId };
             const saleItems = db.sales.filter(s => s.invoiceId === invoiceId && !s.isPaymentRecord);
-            posCart = saleItems.map(item => { 
-                const product = db.products.find(p => p.name === item.product); 
-                return { id: product ? product.id : 0, name: item.product, price: item.price || (item.total/item.quantity), quantity: item.quantity, total: item.total, unit: product ? product.unit : '' }; 
-            });
+            posCart = saleItems.map(item => { const product = db.products.find(p => p.name === item.product); return { id: product ? product.id : 0, name: item.product, price: item.price || (item.total/item.quantity), quantity: item.quantity, total: item.total, unit: product ? product.unit : '' }; });
             navigateTo('#pos-system');
             setTimeout(() => {
                 const savedCustomer = db.customers.find(c => c.name === masterSale.customer);
@@ -1167,13 +1230,13 @@
                 item.total = subtotal; 
                 total += subtotal; 
                 cartBody.innerHTML += `<tr>
-                    <td>${item.name}</td>
-                    <td>
+                    <td data-label="পণ্য">${item.name}</td>
+                    <td data-label="পরিমাণ">
                         <input type="number" value="${item.quantity}" min="1" onchange="updatePosCartQuantity(${index}, this.value)" style="width: 60px; margin-right: 5px;"> 
                         ${item.unit || ''}
                     </td>
-                    <td>${subtotal.toFixed(2)}</td>
-                    <td><button class="action-btn delete-btn" onclick="removeFromPosCart(${index})">X</button></td>
+                    <td data-label="মূল্য">${subtotal.toFixed(2)}</td>
+                    <td data-label="একশন"><button class="action-btn delete-btn" onclick="removeFromPosCart(${index})">X</button></td>
                 </tr>`; 
             });
             const previousDue = parseFloat(document.getElementById('pos-previous-due').value) || 0; const discount = parseFloat(document.getElementById('pos-discount').value) || 0; const paid = parseFloat(document.getElementById('pos-paid').value) || 0;
@@ -1187,35 +1250,9 @@
             const invoiceId = (editState.key === 'posSale' && editState.id) ? editState.id : database.ref().push().key;
             const saveNewSale = () => {
                 const updates = {};
-                posCart.forEach(item => { 
-                    const newItemKey = database.ref('sales').push().key; 
-                    updates[`/sales/${newItemKey}`] = { 
-                        invoiceId, 
-                        product: item.name, 
-                        price: item.price, 
-                        quantity: item.quantity, 
-                        unit: item.unit, // Save unit with each item
-                        total: item.total, 
-                        isPosSale: true, 
-                        isPaymentRecord: false 
-                    }; 
-                });
+                posCart.forEach(item => { const newItemKey = database.ref('sales').push().key; updates[`/sales/${newItemKey}`] = { invoiceId, product: item.name, price: item.price, quantity: item.quantity, unit: item.unit, total: item.total, isPosSale: true, isPaymentRecord: false }; });
                 const masterKey = database.ref('sales').push().key;
-                updates[`/sales/${masterKey}`] = { 
-                    invoiceId, 
-                    date: getTodayDate(), 
-                    customer: customerName, 
-                    sellerName: loggedInUser.name, 
-                    product: 'POS Sale', 
-                    quantity: 1, 
-                    total, 
-                    discount, 
-                    paid, 
-                    due, 
-                    isPosSale: true, 
-                    isPaymentRecord: true, 
-                    timestamp: firebase.database.ServerValue.TIMESTAMP 
-                };
+                updates[`/sales/${masterKey}`] = { invoiceId, date: getTodayDate(), customer: customerName, sellerName: loggedInUser.name, product: 'POS Sale', quantity: 1, total, discount, paid, due, isPosSale: true, isPaymentRecord: true, timestamp: firebase.database.ServerValue.TIMESTAMP };
                 database.ref().update(updates).then(() => {
                     const action = (editState.key === 'posSale') ? 'আপডেট' : 'বিক্রয়'; alert(`${action} সফল হয়েছে!`);
                     if (shouldPrint) { const html = generateInvoiceHtml(customerName, invoiceId, total, discount, paid, due, posCart); printInvoice(html); }
@@ -1237,19 +1274,10 @@
             const htmlContent = generateInvoiceHtml(customerName, 'PREVIEW-123', total, discount, paid, due, posCart);
             const previewWindow = window.open('', '_blank'); previewWindow.document.write(htmlContent); previewWindow.document.close();
         }
+        
         function generateInvoiceHtml(customer, invoiceId, total, discount, paid, due, items, dateStr) {
             let itemsHtml = ''; let sl = 1;
-            items.forEach(item => { 
-                const price = item.price || (item.total / item.quantity); 
-                const itemTotal = price * item.quantity; 
-                itemsHtml += `<tr>
-                    <td>${sl++}</td>
-                    <td>${item.name || item.product}</td>
-                    <td>${price.toFixed(2)}</td>
-                    <td>${item.quantity} ${item.unit || ''}</td>
-                    <td>${itemTotal.toFixed(2)}</td>
-                </tr>`; 
-            });
+            items.forEach(item => { const price = item.price || (item.total / item.quantity); const itemTotal = price * item.quantity; itemsHtml += `<tr><td>${sl++}</td><td>${item.name || item.product}</td><td>${price.toFixed(2)}</td><td>${item.quantity} ${item.unit || ''}</td><td>${itemTotal.toFixed(2)}</td></tr>`; });
             const previousDue = getCustomerDue(customer); const grandTotal = previousDue + total; const finalDue = grandTotal - discount - paid; 
             const displayDate = dateStr || new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
             return `
@@ -1259,11 +1287,12 @@
                 body { font-family: 'Poppins', 'Tiro Bangla', sans-serif; margin: 0; padding: 0; background-color: #fff; color: #333; font-size: 13px; }
                 .invoice-box { max-width: 800px; margin: auto; padding: 20px; } .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
                 .shop-details { text-align: right; } .shop-details h2 { margin: 0; color: #3498db; font-family: 'Poppins', sans-serif; } .shop-details p { margin: 2px 0; font-size: 12px; }
-                .shop-logo { max-width: 100px; max-height: 100px; } .customer-details-wrapper { display: flex; justify-content: space-between; margin-bottom: 30px; background-color: #f8f9fa; padding: 15px; border-radius: 5px;}
+                .shop-logo { max-width: 150px; max-height: 150px; object-fit: contain; }
+                .customer-details-wrapper { display: flex; justify-content: space-between; margin-bottom: 30px; background-color: #f8f9fa; padding: 15px; border-radius: 5px;}
                 .customer-details-wrapper p { margin: 3px 0; } .invoice-title { text-align: center; margin-bottom: 20px; } .invoice-title h1 { display: inline-block; padding: 5px 20px; border: 2px solid #333; text-transform: uppercase; letter-spacing: 2px; }
                 .invoice-table { width: 100%; text-align: left; border-collapse: collapse; } .invoice-table th, .invoice-table td { padding: 10px; border-bottom: 1px solid #eee; }
                 .invoice-table thead th { background-color: #34495e; color: #fff; font-weight: 500; text-transform: uppercase; font-size: 12px;}
-                .invoice-table tr:nth-child(even) { background-color: #fdfdfd; } .summary { display: flex; justify-content: flex-end; margin-top: 20px; } .summary-table { width: 45%; }
+                .summary { display: flex; justify-content: flex-end; margin-top: 20px; } .summary-table { width: 45%; }
                 .summary-table td { padding: 8px 10px; } .summary-table tr td:last-child { text-align: right; } .summary-table tr.total-due td { border-top: 2px solid #333; font-size: 1.1em; font-weight: bold; }
                 .invoice-footer { text-align: center; margin-top: 40px; font-size: 12px; color: #777; } .signature-area { margin-top: 70px; display: flex; justify-content: space-between; }
                 .signature-box { border-top: 1px solid #555; width: 220px; text-align: center; padding-top: 8px; font-weight: 500; }
@@ -1292,238 +1321,165 @@
         };
         
         function loadDashboardData(period = 'today') {
-            const now = new Date();
-            let startDate, endDate;
-            const todayDate = new Date();
-            const todayStr = todayDate.toISOString().split('T')[0];
-            endDate = todayStr;
-
-            if (period === 'today') {
-                startDate = todayStr;
-            } else if (period === 'weekly') {
-                const firstDayOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay()));
-                startDate = firstDayOfWeek.toISOString().split('T')[0];
-            } else if (period === 'monthly') {
-                const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                startDate = firstDayOfMonth.toISOString().split('T')[0];
-            } else if (period === 'yearly') {
-                const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-                startDate = firstDayOfYear.toISOString().split('T')[0];
-            } else { // 'all'
-                startDate = '1970-01-01';
-                endDate = '2999-12-31';
-            }
-
+            const now = new Date(); let startDate, endDate;
+            const todayDate = new Date(); const todayStr = todayDate.toISOString().split('T')[0]; endDate = todayStr;
+            if (period === 'today') { startDate = todayStr; } else if (period === 'weekly') { const firstDayOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay())); startDate = firstDayOfWeek.toISOString().split('T')[0]; } else if (period === 'monthly') { const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); startDate = firstDayOfMonth.toISOString().split('T')[0]; } else if (period === 'yearly') { const firstDayOfYear = new Date(now.getFullYear(), 0, 1); startDate = firstDayOfYear.toISOString().split('T')[0]; } else { startDate = '1970-01-01'; endDate = '2999-12-31'; }
             const filterByDate = item => item.date && item.date >= startDate && item.date <= endDate;
-            
             const paymentRecordsInRange = db.sales.filter(filterByDate).filter(s => s.isPaymentRecord);
             const totalRevenueInRange = paymentRecordsInRange.reduce((sum, s) => sum + s.paid, 0);
-
             const invoiceIdsInRange = paymentRecordsInRange.map(p => p.invoiceId);
             const itemSalesInRange = db.sales.filter(s => invoiceIdsInRange.includes(s.invoiceId) && !s.isPaymentRecord);
-            const totalCostOfGoodsSoldInRange = itemSalesInRange.reduce((costSum, sale) => {
+            const totalCostOfGoodsSoldInRange = itemSalesInRange.reduce((costSum, sale) => { const product = db.products.find(p => p.name === sale.product); if (product) { return costSum + ((product.purchaseCost || 0) * sale.quantity); } return costSum; }, 0);
+            const totalPurchasesInRange = db.purchases.filter(filterByDate).reduce((sum, p) => sum + p.total, 0);
+            const totalShopExpenseInRange = db.shopExpenses.filter(filterByDate).reduce((sum, e) => sum + e.amount, 0);
+            const totalComputerIncomeInRange = db.computerIncomes.filter(filterByDate).reduce((sum, i) => sum + i.amount, 0);
+            const totalDueOverall = db.sales.filter(s => s.isPaymentRecord).reduce((sum, s) => sum + s.due, 0);
+            const mobileFinanceBalance = db.mobileFinances.reduce((balance, item) => { return item.type === 'Cash In' ? balance + item.amount : balance - item.amount; }, 0);
+            const titles = { sale: { bn: "বিক্রি", en: "Sale" }, purchase: { bn: "ক্রয়", en: "Purchase" }, profit: { bn: "লাভ", en: "Profit" }, expense: { bn: "খরচ", en: "Expense" }, computerIncome: { bn: "কম্পিউটার ইনকাম", en: "Computer Income" } };
+            const periodPrefix = { today: { bn: 'আজকের', en: "Today's" }, weekly: { bn: 'সাপ্তাহিক', en: "Weekly" }, monthly: { bn: 'মাসিক', en: "Monthly" }, yearly: { bn: 'বাৎসরিক', en: "Yearly" }, all: { bn: 'সর্বমোট', en: 'Total' } };
+            const prefix = periodPrefix[period][currentLanguage];
+            document.querySelector('.card.c1 h3').textContent = `${prefix} ${titles.sale[currentLanguage]}`; document.querySelector('.card.c2 h3').textContent = `${prefix} ${titles.purchase[currentLanguage]}`; document.querySelector('.card.c3 h3').textContent = `${prefix} ${titles.profit[currentLanguage]}`; document.querySelector('.card.c7 h3').textContent = `${prefix} ${titles.expense[currentLanguage]}`; document.querySelector('.card.c8 h3').textContent = `${prefix} ${titles.computerIncome[currentLanguage]}`;
+            document.querySelector('.card.c6 h3').textContent = translations.dashTotalDue[currentLanguage]; document.querySelector('.card.c9 h3').textContent = translations.dashMobileFinanceBalance[currentLanguage]; document.querySelector('.card.c4 h3').textContent = translations.dashTotalCustomers[currentLanguage]; document.querySelector('.card.c5 h3').textContent = translations.dashTotalSuppliers[currentLanguage];
+            document.getElementById('today-sale').textContent = totalRevenueInRange.toFixed(2); document.getElementById('today-purchase').textContent = totalPurchasesInRange.toFixed(2); document.getElementById('today-profit').textContent = (totalRevenueInRange - totalCostOfGoodsSoldInRange).toFixed(2); document.getElementById('monthly-shop-expense').textContent = totalShopExpenseInRange.toFixed(2); document.getElementById('total-computer-income').textContent = totalComputerIncomeInRange.toFixed(2); 
+            document.getElementById('total-due-from-customers').textContent = totalDueOverall.toFixed(2); document.getElementById('mobile-finance-balance').textContent = mobileFinanceBalance.toFixed(2); document.getElementById('total-customers').textContent = db.customers.length; document.getElementById('total-suppliers').textContent = db.suppliers.length; 
+        }
+
+        function handleReportGeneration(e) {
+            e.preventDefault();
+            const start = document.getElementById('report-start-date').value;
+            const end = document.getElementById('report-end-date').value;
+            if (!start || !end) {
+                alert("অনুগ্রহ করে শুরুর এবং শেষের তারিখ দিন।");
+                return;
+            }
+
+            const filterByDate = item => item.date >= start && item.date <= end;
+            
+            const paymentRecordsInRange = db.sales.filter(filterByDate).filter(s => s.isPaymentRecord);
+            const totalSales = paymentRecordsInRange.reduce((s, i) => s + i.total, 0);
+            const totalDiscount = paymentRecordsInRange.reduce((s, i) => s + (i.discount || 0), 0);
+            const invoiceIdsInRange = paymentRecordsInRange.map(p => p.invoiceId);
+            const itemSalesInRange = db.sales.filter(s => invoiceIdsInRange.includes(s.invoiceId) && !s.isPaymentRecord);
+            const totalCost = itemSalesInRange.reduce((costSum, sale) => {
                 const product = db.products.find(p => p.name === sale.product);
                 if (product) { return costSum + ((product.purchaseCost || 0) * sale.quantity); }
                 return costSum;
             }, 0);
 
-            const totalPurchasesInRange = db.purchases.filter(filterByDate).reduce((sum, p) => sum + p.total, 0);
-            const totalShopExpenseInRange = db.shopExpenses.filter(filterByDate).reduce((sum, e) => sum + e.amount, 0);
-            const totalComputerIncomeInRange = db.computerIncomes.filter(filterByDate).reduce((sum, i) => sum + i.amount, 0);
-            
-            const totalDueOverall = db.sales.filter(s => s.isPaymentRecord).reduce((sum, s) => sum + s.due, 0);
-            const mobileFinanceBalance = db.mobileFinances.reduce((balance, item) => {
-                return item.type === 'Cash In' ? balance + item.amount : balance - item.amount;
-            }, 0);
+            const totalCompIncome = db.computerIncomes.filter(filterByDate).reduce((s, i) => s + i.amount, 0);
+            const totalShopExp = db.shopExpenses.filter(filterByDate).reduce((s, i) => s + i.amount, 0);
+            const totalIncome = totalSales + totalCompIncome;
+            const totalExpense = totalCost + totalShopExp + totalDiscount;
+            const netProfit = totalIncome - totalExpense;
 
-            const titles = {
-                sale: { bn: "বিক্রি", en: "Sale" },
-                purchase: { bn: "ক্রয়", en: "Purchase" },
-                profit: { bn: "লাভ", en: "Profit" },
-                expense: { bn: "খরচ", en: "Expense" },
-                computerIncome: { bn: "কম্পিউটার ইনকাম", en: "Computer Income" }
-            };
-            const periodPrefix = {
-                today: { bn: 'আজকের', en: "Today's" },
-                weekly: { bn: 'সাপ্তাহিক', en: "Weekly" },
-                monthly: { bn: 'মাসিক', en: "Monthly" },
-                yearly: { bn: 'বাৎসরিক', en: "Yearly" },
-                all: { bn: 'সর্বমোট', en: 'Total' }
-            };
-            const prefix = periodPrefix[period][currentLanguage];
-
-            document.querySelector('.card.c1 h3').textContent = `${prefix} ${titles.sale[currentLanguage]}`;
-            document.querySelector('.card.c2 h3').textContent = `${prefix} ${titles.purchase[currentLanguage]}`;
-            document.querySelector('.card.c3 h3').textContent = `${prefix} ${titles.profit[currentLanguage]}`;
-            document.querySelector('.card.c7 h3').textContent = `${prefix} ${titles.expense[currentLanguage]}`;
-            document.querySelector('.card.c8 h3').textContent = `${prefix} ${titles.computerIncome[currentLanguage]}`;
-            
-            document.querySelector('.card.c6 h3').textContent = translations.dashTotalDue[currentLanguage];
-            document.querySelector('.card.c9 h3').textContent = translations.dashMobileFinanceBalance[currentLanguage];
-            document.querySelector('.card.c4 h3').textContent = translations.dashTotalCustomers[currentLanguage];
-            document.querySelector('.card.c5 h3').textContent = translations.dashTotalSuppliers[currentLanguage];
-
-            document.getElementById('today-sale').textContent = totalRevenueInRange.toFixed(2); 
-            document.getElementById('today-purchase').textContent = totalPurchasesInRange.toFixed(2); 
-            document.getElementById('today-profit').textContent = (totalRevenueInRange - totalCostOfGoodsSoldInRange).toFixed(2);
-            document.getElementById('monthly-shop-expense').textContent = totalShopExpenseInRange.toFixed(2); 
-            document.getElementById('total-computer-income').textContent = totalComputerIncomeInRange.toFixed(2); 
-            
-            document.getElementById('total-due-from-customers').textContent = totalDueOverall.toFixed(2); 
-            document.getElementById('mobile-finance-balance').textContent = mobileFinanceBalance.toFixed(2);
-            document.getElementById('total-customers').textContent = db.customers.length; 
-            document.getElementById('total-suppliers').textContent = db.suppliers.length; 
-        }
-
-        function handleReportGeneration(e) {
-            e.preventDefault(); const start = document.getElementById('report-start-date').value; const end = document.getElementById('report-end-date').value; if(!start || !end) { alert("অনুগ্রহ করে শুরুর এবং শেষের তারিখ দিন।"); return; } const filterByDate = item => item.date >= start && item.date <= end;
-            const paymentRecordsInRange = db.sales.filter(filterByDate).filter(s => s.isPaymentRecord); const totalSales = paymentRecordsInRange.reduce((s, i) => s + i.total, 0); const totalDiscount = paymentRecordsInRange.reduce((s, i) => s + (i.discount || 0), 0);
-            const invoiceIdsInRange = paymentRecordsInRange.map(p => p.invoiceId);
-            const itemSalesInRange = db.sales.filter(s => invoiceIdsInRange.includes(s.invoiceId) && !s.isPaymentRecord);
-            const totalCost = itemSalesInRange.reduce((costSum, sale) => { const product = db.products.find(p => p.name === sale.product); if (product) { return costSum + ((product.purchaseCost || 0) * sale.quantity); } return costSum; }, 0);
-            const totalCompIncome = db.computerIncomes.filter(filterByDate).reduce((s, i) => s + i.amount, 0); const totalShopExp = db.shopExpenses.filter(filterByDate).reduce((s, i) => s + i.amount, 0);
-            const totalIncome = totalSales + totalCompIncome; const totalExpense = totalCost + totalShopExp + totalDiscount;
-            document.getElementById('report-output').innerHTML = `<div class="print-area"><h3>রিপোর্ট (${start} থেকে ${end})</h3><ul><li>পণ্য বিক্রি থেকে আয়: ${totalSales.toFixed(2)}</li><li>কম্পিউটার থেকে আয়: ${totalCompIncome.toFixed(2)}</li><li><b>মোট আয়: ${totalIncome.toFixed(2)}</b></li><hr><li>বিক্রিত পণ্যের খরচ: ${totalCost.toFixed(2)}</li><li>প্রদত্ত ছাড়: ${totalDiscount.toFixed(2)}</li><li>দোকানের অন্যান্য খরচ: ${totalShopExp.toFixed(2)}</li><li><b>মোট ব্যয়: ${totalExpense.toFixed(2)}</b></li><hr><li><h3>নীট লাভ/ক্ষতি: ${(totalIncome - totalExpense).toFixed(2)}</h3></li></ul></div>`;
+            document.getElementById('report-output').innerHTML = `<div class="print-area"><h3>রিপোর্ট (${start} থেকে ${end})</h3><ul><li>পণ্য বিক্রি থেকে আয়: ${totalSales.toFixed(2)}</li><li>কম্পিউটার থেকে আয়: ${totalCompIncome.toFixed(2)}</li><li><b>মোট আয়: ${totalIncome.toFixed(2)}</b></li><hr><li>বিক্রিত পণ্যের খরচ: ${totalCost.toFixed(2)}</li><li>প্রদত্ত ছাড়: ${totalDiscount.toFixed(2)}</li><li>দোকানের অন্যান্য খরচ: ${totalShopExp.toFixed(2)}</li><li><b>মোট ব্যয়: ${totalExpense.toFixed(2)}</b></li><hr><li><h3>নীট লাভ/ক্ষতি: ${netProfit.toFixed(2)}</h3></li></ul></div>`;
             document.getElementById('print-report-btn').style.display = 'inline-block';
-        }
-        function printReport() { const reportOutput = document.getElementById('report-output'); const clone = reportOutput.cloneNode(true); const printWindow = window.open('', '_blank'); printWindow.document.write(`<html><head><title>রিপোর্ট</title><style>body{font-family: 'Poppins', sans-serif;} h3,li{margin-bottom:10px;} hr{margin:15px 0;}</style></head><body><h2 style="text-align:center;">${db.shopInfo.name}</h2>${clone.innerHTML}</body></html>`); printWindow.document.close(); printWindow.focus(); printWindow.print(); printWindow.close(); }
-        function setAppLogo(logoSrc) { 
-            const headerLogo = document.getElementById('header-logo'); const profileLogo = document.getElementById('logo-preview'); const loginLogo = document.getElementById('login-page-logo');
-            const defaultLogo = 'https://via.placeholder.com/200'; 
-            if (logoSrc) { headerLogo.src = logoSrc; headerLogo.style.display = 'inline-block'; profileLogo.src = logoSrc; if(loginLogo) loginLogo.src = logoSrc; } 
-            else { headerLogo.style.display = 'none'; profileLogo.src = defaultLogo; if(loginLogo) loginLogo.src = defaultLogo; } 
-        }
-        function loadProfilePage() { setAppLogo(db.shopInfo.logo); }
-        function handleLogoUpload(e) { 
-            const file = e.target.files[0]; if (!file) return;
-            const apiKey = '07a9c70579b89377dc931ef0fb35e0f4'; const formData = new FormData(); formData.append('image', file);
-            fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, { method: 'POST', body: formData }).then(response => response.json())
-            .then(result => { if(result.success){ database.ref('shopInfo/logo').set(result.data.url); alert('লোগো সফলভাবে আপলোড হয়েছে।'); } else { throw new Error(result.error.message); } })
-            .catch(error => alert('লোগো আপলোড করতে সমস্যা হয়েছে: ' + error.message));
-        }
-        function loadSettingsPage() {
-            database.ref('shopInfo').once('value', (snapshot) => {
-                const info = snapshot.val() || {};
-                document.getElementById('shop-name').value = info.name || 'শফিকুল ইলেকট্রনিক কর্নার'; document.getElementById('shop-address').value = info.address || ''; 
-                document.getElementById('shop-mobile').value = info.mobile || ''; document.getElementById('shop-proprietor').value = info.proprietor || ''; 
-                document.getElementById('sms-gateway-url').value = info.smsGatewayUrl || '';
+            document.getElementById('report-charts-container').style.display = 'block';
+
+            if(incomeExpenseChartInstance) { incomeExpenseChartInstance.destroy(); }
+            if(topProductsChartInstance) { topProductsChartInstance.destroy(); }
+
+            const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+            incomeExpenseChartInstance = new Chart(incomeExpenseCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['মোট আয়', 'মোট ব্যয়', 'নীট লাভ'],
+                    datasets: [{
+                        label: 'টাকার পরিমাণ',
+                        data: [totalIncome, totalExpense, netProfit],
+                        backgroundColor: ['rgba(46, 204, 113, 0.7)', 'rgba(231, 76, 60, 0.7)', 'rgba(52, 152, 219, 0.7)'],
+                        borderColor: ['#2ecc71', '#e74c3c', '#3498db'],
+                        borderWidth: 1
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            const productSales = {};
+            itemSalesInRange.forEach(sale => {
+                productSales[sale.product] = (productSales[sale.product] || 0) + sale.quantity;
+            });
+            const sortedProducts = Object.entries(productSales).sort(([,a],[,b]) => b-a).slice(0, 5);
+            
+            const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+            topProductsChartInstance = new Chart(topProductsCtx, {
+                type: 'pie',
+                data: {
+                    labels: sortedProducts.map(p => p[0]),
+                    datasets: [{
+                        label: 'বিক্রিত পরিমাণ',
+                        data: sortedProducts.map(p => p[1]),
+                        backgroundColor: ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c', '#9b59b6'],
+                        hoverOffset: 4
+                    }]
+                }
             });
         }
-        function handleSettingsSubmit(e) { 
-            e.preventDefault(); 
-            const newInfo = { name: document.getElementById('shop-name').value, address: document.getElementById('shop-address').value, mobile: document.getElementById('shop-mobile').value, proprietor: document.getElementById('shop-proprietor').value, smsGatewayUrl: document.getElementById('sms-gateway-url').value.trim() };
-            database.ref('shopInfo').update(newInfo).then(() => alert('সেটিংস সফলভাবে সেভ করা হয়েছে।'));
-        }
-        function handlePasswordChange(e) { 
-            e.preventDefault(); 
-            if (document.getElementById('current-password').value === db.credentials.password) { 
-                const newPassword = document.getElementById('new-password').value;
-                database.ref('credentials/password').set(newPassword).then(() => { alert('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।'); e.target.reset(); });
-            } else { alert('বর্তমান পাসওয়ার্ড ভুল।'); } 
-        }
-        function loadUserManagementPage() {
-            const tBody = document.querySelector('#user-table tbody'); tBody.innerHTML = '';
-            db.users.forEach((user) => { tBody.innerHTML += `<tr><td>${user.name}</td><td>${user.mobile}</td><td>${user.email || ''}</td><td>${user.role}</td><td><button class="action-btn edit-btn" onclick="editItem('users', '${user.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('users', '${user.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; });
-            resetForm(document.getElementById('user-form'), document.getElementById('user-submit-btn'), 'saveBtn');
-            document.getElementById('user-pass').placeholder = 'পাসওয়ার্ড'; document.getElementById('user-pass').required = true;
-        }
-        function handleUserSubmit(e) {
-            e.preventDefault(); const btn = document.getElementById('user-submit-btn'); btn.disabled = true;
-            const userData = { name: document.getElementById('user-name').value.trim(), mobile: document.getElementById('user-mobile').value, email: document.getElementById('user-email').value, role: document.getElementById('user-role').value };
-            const pass = document.getElementById('user-pass').value; let promise;
-            if (editState.key === 'users' && editState.id) { if (pass) userData.pass = pass; promise = database.ref('users').child(editState.id).update(userData); } 
-            else { userData.pass = pass; promise = database.ref('users').push(userData); }
-            promise.then(() => { const action = (editState.key === 'users') ? 'আপডেট' : 'সেভ'; alert(`ইউজার সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; });
-        }
-        function loadUnitsPage() {
-            const tBody = document.querySelector('#unit-table tbody'); tBody.innerHTML = '';
-            db.units.forEach((unit) => { tBody.innerHTML += `<tr><td>${unit.name}</td><td>${unit.description || ''}</td><td><button class="action-btn edit-btn" onclick="editItem('units', '${unit.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('units', '${unit.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; });
-            resetForm(document.getElementById('unit-form'), document.getElementById('unit-submit-btn'), 'saveUnitBtn');
-        }
-        function handleUnitSubmit(e) {
-            e.preventDefault(); const btn = document.getElementById('unit-submit-btn'); btn.disabled = true;
-            const unitData = { name: document.getElementById('unit-name').value.trim(), description: document.getElementById('unit-description').value };
-            let promise;
-            if (editState.key === 'units' && editState.id) { promise = database.ref('units').child(editState.id).update(unitData); } 
-            else { promise = database.ref('units').push(unitData); }
-            promise.then(() => { const action = (editState.key === 'units') ? 'আপডেট' : 'সেভ'; alert(`Unit সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; });
-        }
 
-        // --- নতুন ফাংশন শুরু ---
-        function loadCategoryPage() {
-            const tBody = document.querySelector('#category-table tbody'); tBody.innerHTML = '';
-            db.categories.forEach((item) => { tBody.innerHTML += `<tr><td>${item.name}</td><td>${item.description || ''}</td><td><button class="action-btn edit-btn" onclick="editItem('categories', '${item.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('categories', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; });
-            resetForm(document.getElementById('category-form'), document.getElementById('category-submit-btn'), 'saveBtn');
-        }
-
-        function handleCategorySubmit(e) {
-            e.preventDefault(); const btn = document.getElementById('category-submit-btn'); btn.disabled = true;
-            const data = { name: document.getElementById('category-name').value.trim(), description: document.getElementById('category-description').value };
-            let promise;
-            if (editState.key === 'categories' && editState.id) { promise = database.ref('categories').child(editState.id).update(data); } 
-            else { promise = database.ref('categories').push(data); }
-            promise.then(() => { const action = (editState.key === 'categories') ? 'আপডেট' : 'সেভ'; alert(`ক্যাটাগরি সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; });
-        }
+        function printReport() { const reportOutput = document.getElementById('report-output'); const clone = reportOutput.cloneNode(true); const printWindow = window.open('', '_blank'); printWindow.document.write(`<html><head><title>রিপোর্ট</title><style>body{font-family: 'Poppins', sans-serif;} h3,li{margin-bottom:10px;} hr{margin:15px 0;}</style></head><body><h2 style="text-align:center;">${db.shopInfo.name}</h2>${clone.innerHTML}</body></html>`); printWindow.document.close(); printWindow.focus(); printWindow.print(); printWindow.close(); }
+        function setAppLogo(logoSrc) { const headerLogo = document.getElementById('header-logo'); const profileLogo = document.getElementById('logo-preview'); const loginLogo = document.getElementById('login-page-logo'); const defaultLogo = 'https://via.placeholder.com/200'; if (logoSrc) { headerLogo.src = logoSrc; headerLogo.style.display = 'inline-block'; profileLogo.src = logoSrc; if(loginLogo) loginLogo.src = logoSrc; } else { headerLogo.style.display = 'none'; profileLogo.src = defaultLogo; if(loginLogo) loginLogo.src = defaultLogo; } }
+        function loadProfilePage() { setAppLogo(db.shopInfo.logo); }
+        function handleLogoUpload(e) { const file = e.target.files[0]; if (!file) return; const apiKey = '07a9c70579b89377dc931ef0fb35e0f4'; const formData = new FormData(); formData.append('image', file); fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, { method: 'POST', body: formData }).then(response => response.json()).then(result => { if(result.success){ database.ref('shopInfo/logo').set(result.data.url); alert('লোগো সফলভাবে আপলোড হয়েছে।'); } else { throw new Error(result.error.message); } }).catch(error => alert('লোগো আপলোড করতে সমস্যা হয়েছে: ' + error.message)); }
         
-        function loadBrandPage() {
-            const tBody = document.querySelector('#brand-table tbody'); tBody.innerHTML = '';
-            db.brands.forEach((item) => { tBody.innerHTML += `<tr><td>${item.name}</td><td>${item.description || ''}</td><td><button class="action-btn edit-btn" onclick="editItem('brands', '${item.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('brands', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; });
-            resetForm(document.getElementById('brand-form'), document.getElementById('brand-submit-btn'), 'saveBtn');
-        }
-
-        function handleBrandSubmit(e) {
-            e.preventDefault(); const btn = document.getElementById('brand-submit-btn'); btn.disabled = true;
-            const data = { name: document.getElementById('brand-name').value.trim(), description: document.getElementById('brand-description').value };
-            let promise;
-            if (editState.key === 'brands' && editState.id) { promise = database.ref('brands').child(editState.id).update(data); } 
-            else { promise = database.ref('brands').push(data); }
-            promise.then(() => { const action = (editState.key === 'brands') ? 'আপডেট' : 'সেভ'; alert(`ব্রান্ড সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; });
-        }
-        // --- নতুন ফাংশন শেষ ---
-
-        function loadSmsSenderPage() {
-            const customerSelect = document.getElementById('sms-customer-select'); customerSelect.innerHTML = '<option value="">-- কাস্টমার সিলেক্ট করুন --</option>';
-            db.customers.filter(c => c.mobile).forEach(customer => { customerSelect.innerHTML += `<option value="${customer.id}">${customer.name} - ${customer.mobile}</option>`; });
-            document.getElementById('sms-form').reset();
-        }
-        function handleSendWhatsApp() {
-            const customerId = document.getElementById('sms-customer-select').value; const message = document.getElementById('sms-message-body').value.trim();
-            if (!customerId) { alert('অনুগ্রহ করে একজন কাস্টমার সিলেক্ট করুন।'); return; } if (!message) { alert('অনুগ্রহ করে মেসেজ লিখুন।'); return; }
-            const customer = db.customers.find(c => c.id === customerId); if (!customer || !customer.mobile) { alert('এই কাস্টমারের কোনো মোবাইল নম্বর পাওয়া যায়নি।'); return; }
-            let phoneNumber = customer.mobile.replace(/[\s+-]/g, ''); if (phoneNumber.length === 11 && phoneNumber.startsWith('01')) { phoneNumber = '88' + phoneNumber; }
-            const encodedMessage = encodeURIComponent(message); const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-        }
-        function loadSmsTemplatesPage() {
-            const tBody = document.querySelector('#template-table tbody'); tBody.innerHTML = '';
-            db.templates.forEach(template => { tBody.innerHTML += `<tr><td>${template.name}</td><td style="white-space: pre-wrap;">${template.body}</td><td><button class="action-btn edit-btn" onclick="editItem('templates', '${template.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('templates', '${template.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; });
-            resetForm(document.getElementById('template-form'), document.getElementById('template-submit-btn'), 'saveBtn');
-        }
-        function handleSmsTemplateSubmit(e) {
-            e.preventDefault(); const btn = document.getElementById('template-submit-btn'); btn.disabled = true;
-            const templateData = { name: document.getElementById('template-name').value.trim(), body: document.getElementById('template-body').value };
-            let promise;
-            if (editState.key === 'templates' && editState.id) { promise = database.ref('templates').child(editState.id).update(templateData); } 
-            else { promise = database.ref('templates').push(templateData); }
-            promise.then(() => { alert('টেমপ্লেট সফলভাবে সেভ হয়েছে!'); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; });
-        }
-        async function sendDueReminderSms(customerId) {
-            const gatewayUrl = db.shopInfo.smsGatewayUrl; if (!gatewayUrl) { alert('অনুগ্রহ করে সেটিংস পেজ থেকে SMS গেটওয়ে URL সেট করুন।'); return; }
-            if (db.templates.length === 0) { alert('অনুগ্রহ করে প্রথমে একটি SMS টেমপ্লেট তৈরি করুন।'); return; }
-            const customer = db.customers.find(c => c.id === customerId); if (!customer || !customer.mobile) { alert('এই কাস্টমারের মোবাইল নম্বর পাওয়া যায়নি।'); return; }
-            const totalDue = db.sales.filter(s => s.isPaymentRecord && s.customer === customer.name).reduce((sum, s) => sum + s.due, 0); if (totalDue <= 0) { alert('এই কাস্টমারের কোনো বকেয়া নেই।'); return; }
-            let messageBody = db.templates[0].body; messageBody = messageBody.replace(/{customer_name}/g, customer.name); messageBody = messageBody.replace(/{due_amount}/g, totalDue.toFixed(2));
-            let phoneNumber = customer.mobile.replace(/[\s+-]/g, ''); if (phoneNumber.length === 11 && phoneNumber.startsWith('01')) phoneNumber = '+88' + phoneNumber;
-            if (confirm(`আপনি কি "${customer.name}"-কে এই মেসেজটি পাঠাতে চান?\n\n"${messageBody}"`)) {
-                try {
-                    const response = await fetch(`${gatewayUrl}/api/v1/sms/send`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: phoneNumber, message: messageBody }) });
-                    const result = await response.json(); if (response.ok && result.success) { alert('SMS সফলভাবে পাঠানোর জন্য আপনার ফোনে পাঠানো হয়েছে!'); } else { throw new Error(result.message || 'SMS পাঠানো সম্ভব হয়নি।'); }
-                } catch (error) { console.error('SMS পাঠানোর সময় ত্রুটি:', error); alert(`SMS পাঠাতে সমস্যা হয়েছে। \n\nError: ${error.message}`); }
+        function loadSettingsPage() {
+            database.ref('shopInfo').once('value', (snapshot) => { 
+                const info = snapshot.val() || {}; 
+                document.getElementById('shop-name').value = info.name || 'শফিকুল ইলেকট্রনিক কর্নার'; 
+                document.getElementById('shop-address').value = info.address || ''; 
+                document.getElementById('shop-mobile').value = info.mobile || ''; 
+                document.getElementById('shop-proprietor').value = info.proprietor || ''; 
+                document.getElementById('sms-gateway-url').value = info.smsGatewayUrl || ''; 
+            });
+            // ✅ পরিবর্তন: ব্যবহারকারীর ভূমিকার উপর ভিত্তি করে ডেঞ্জার জোন দেখানো বা লুকানো
+            const dangerZone = document.getElementById('danger-zone');
+            if (loggedInUser && (loggedInUser.role === 'Admin' || loggedInUser.name === 'Super Admin')) {
+                dangerZone.style.display = 'block';
+            } else {
+                dangerZone.style.display = 'none';
             }
         }
+
+        // ✅ পরিবর্তন: সমস্ত ডেটা মুছে ফেলার ফাংশন
+        function handleDeleteAllData() {
+            const confirmation1 = prompt('এই কাজটি ডাটাবেসের সমস্ত তথ্য স্থায়ীভাবে মুছে ফেলবে। আপনি যদি নিশ্চিত হন, তবে ইংরেজিতে "DELETE" শব্দটি টাইপ করুন।');
+            if (confirmation1 !== 'DELETE') {
+                alert('মুছে ফেলার প্রক্রিয়া বাতিল করা হয়েছে।');
+                return;
+            }
+
+            const confirmation2 = confirm('সতর্কবাণী! এটি আপনার শেষ সুযোগ। "OK" চাপলে সমস্ত ডেটা মুছে যাবে এবং এই কাজটি আর ফেরানো যাবে না।');
+            if (confirmation2) {
+                alert('ডেটা মুছে ফেলার প্রক্রিয়া শুরু হচ্ছে...');
+                database.ref().remove()
+                    .then(() => {
+                        alert('ডাটাবেসের সমস্ত তথ্য সফলভাবে মুছে ফেলা হয়েছে। অ্যাপটি এখন রিলোড হবে।');
+                        window.location.reload();
+                    })
+                    .catch((error) => {
+                        alert('ডেটা মুছতে গিয়ে একটি ত্রুটি হয়েছে: ' + error.message);
+                    });
+            } else {
+                alert('মুছে ফেলার প্রক্রিয়া বাতিল করা হয়েছে।');
+            }
+        }
+
+        function handleSettingsSubmit(e) { e.preventDefault(); const newInfo = { name: document.getElementById('shop-name').value, address: document.getElementById('shop-address').value, mobile: document.getElementById('shop-mobile').value, proprietor: document.getElementById('shop-proprietor').value, smsGatewayUrl: document.getElementById('sms-gateway-url').value.trim() }; database.ref('shopInfo').update(newInfo).then(() => alert('সেটিংস সফলভাবে সেভ করা হয়েছে।')); }
+        function handlePasswordChange(e) { e.preventDefault(); if (document.getElementById('current-password').value === db.credentials.password) { const newPassword = document.getElementById('new-password').value; database.ref('credentials/password').set(newPassword).then(() => { alert('পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।'); e.target.reset(); }); } else { alert('বর্তমান পাসওয়ার্ড ভুল।'); } }
+        function loadUserManagementPage() { const tBody = document.querySelector('#user-table tbody'); tBody.innerHTML = ''; db.users.forEach((user) => { tBody.innerHTML += `<tr><td data-label="নাম">${user.name}</td><td data-label="মোবাইল">${user.mobile}</td><td data-label="ইমেইল">${user.email || ''}</td><td data-label="ভূমিকা">${user.role}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('users', '${user.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('users', '${user.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('user-form'), document.getElementById('user-submit-btn'), 'saveBtn'); document.getElementById('user-pass').placeholder = 'পাসওয়ার্ড'; document.getElementById('user-pass').required = true; }
+        function handleUserSubmit(e) { e.preventDefault(); const btn = document.getElementById('user-submit-btn'); btn.disabled = true; const userData = { name: document.getElementById('user-name').value.trim(), mobile: document.getElementById('user-mobile').value, email: document.getElementById('user-email').value, role: document.getElementById('user-role').value }; const pass = document.getElementById('user-pass').value; let promise; if (editState.key === 'users' && editState.id) { if (pass) userData.pass = pass; promise = database.ref('users').child(editState.id).update(userData); } else { userData.pass = pass; promise = database.ref('users').push(userData); } promise.then(() => { const action = (editState.key === 'users') ? 'আপডেট' : 'সেভ'; alert(`ইউজার সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; }); }
+        function loadUnitsPage() { const tBody = document.querySelector('#unit-table tbody'); tBody.innerHTML = ''; db.units.forEach((unit) => { tBody.innerHTML += `<tr><td data-label="Unit-এর নাম">${unit.name}</td><td data-label="বিবরণ">${unit.description || ''}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('units', '${unit.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('units', '${unit.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('unit-form'), document.getElementById('unit-submit-btn'), 'saveUnitBtn'); }
+        function handleUnitSubmit(e) { e.preventDefault(); const btn = document.getElementById('unit-submit-btn'); btn.disabled = true; const unitData = { name: document.getElementById('unit-name').value.trim(), description: document.getElementById('unit-description').value }; let promise; if (editState.key === 'units' && editState.id) { promise = database.ref('units').child(editState.id).update(unitData); } else { promise = database.ref('units').push(unitData); } promise.then(() => { const action = (editState.key === 'units') ? 'আপডেট' : 'সেভ'; alert(`Unit সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; }); }
+        function loadCategoryPage() { const tBody = document.querySelector('#category-table tbody'); tBody.innerHTML = ''; db.categories.forEach((item) => { tBody.innerHTML += `<tr><td data-label="নাম">${item.name}</td><td data-label="বিবরণ">${item.description || ''}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('categories', '${item.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('categories', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('category-form'), document.getElementById('category-submit-btn'), 'saveBtn'); }
+        function handleCategorySubmit(e) { e.preventDefault(); const btn = document.getElementById('category-submit-btn'); btn.disabled = true; const data = { name: document.getElementById('category-name').value.trim(), description: document.getElementById('category-description').value }; let promise; if (editState.key === 'categories' && editState.id) { promise = database.ref('categories').child(editState.id).update(data); } else { promise = database.ref('categories').push(data); } promise.then(() => { const action = (editState.key === 'categories') ? 'আপডেট' : 'সেভ'; alert(`ক্যাটাগরি সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; }); }
+        function loadBrandPage() { const tBody = document.querySelector('#brand-table tbody'); tBody.innerHTML = ''; db.brands.forEach((item) => { tBody.innerHTML += `<tr><td data-label="নাম">${item.name}</td><td data-label="বিবরণ">${item.description || ''}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('brands', '${item.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('brands', '${item.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('brand-form'), document.getElementById('brand-submit-btn'), 'saveBtn'); }
+        function handleBrandSubmit(e) { e.preventDefault(); const btn = document.getElementById('brand-submit-btn'); btn.disabled = true; const data = { name: document.getElementById('brand-name').value.trim(), description: document.getElementById('brand-description').value }; let promise; if (editState.key === 'brands' && editState.id) { promise = database.ref('brands').child(editState.id).update(data); } else { promise = database.ref('brands').push(data); } promise.then(() => { const action = (editState.key === 'brands') ? 'আপডেট' : 'সেভ'; alert(`ব্রান্ড সফলভাবে ${action} হয়েছে!`); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; }); }
+        function loadSmsSenderPage() { const customerSelect = document.getElementById('sms-customer-select'); customerSelect.innerHTML = '<option value="">-- কাস্টমার সিলেক্ট করুন --</option>'; db.customers.filter(c => c.mobile).forEach(customer => { customerSelect.innerHTML += `<option value="${customer.id}">${customer.name} - ${customer.mobile}</option>`; }); document.getElementById('sms-form').reset(); }
+        function handleSendWhatsApp() { const customerId = document.getElementById('sms-customer-select').value; const message = document.getElementById('sms-message-body').value.trim(); if (!customerId) { alert('অনুগ্রহ করে একজন কাস্টমার সিলেক্ট করুন।'); return; } if (!message) { alert('অনুগ্রহ করে মেসেজ লিখুন।'); return; } const customer = db.customers.find(c => c.id === customerId); if (!customer || !customer.mobile) { alert('এই কাস্টমারের কোনো মোবাইল নম্বর পাওয়া যায়নি।'); return; } let phoneNumber = customer.mobile.replace(/[\s+-]/g, ''); if (phoneNumber.length === 11 && phoneNumber.startsWith('01')) { phoneNumber = '88' + phoneNumber; } const encodedMessage = encodeURIComponent(message); const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`; window.open(whatsappUrl, '_blank'); }
+        function loadSmsTemplatesPage() { const tBody = document.querySelector('#template-table tbody'); tBody.innerHTML = ''; db.templates.forEach(template => { tBody.innerHTML += `<tr><td data-label="নাম">${template.name}</td><td data-label="মেসেজ" style="white-space: pre-wrap;">${template.body}</td><td data-label="একশন"><button class="action-btn edit-btn" onclick="editItem('templates', '${template.id}')">${translations.editBtn[currentLanguage]}</button><button class="action-btn delete-btn" onclick="deleteItem('templates', '${template.id}')">${translations.deleteBtn[currentLanguage]}</button></td></tr>`; }); resetForm(document.getElementById('template-form'), document.getElementById('template-submit-btn'), 'saveBtn'); }
+        function handleSmsTemplateSubmit(e) { e.preventDefault(); const btn = document.getElementById('template-submit-btn'); btn.disabled = true; const templateData = { name: document.getElementById('template-name').value.trim(), body: document.getElementById('template-body').value }; let promise; if (editState.key === 'templates' && editState.id) { promise = database.ref('templates').child(editState.id).update(templateData); } else { promise = database.ref('templates').push(templateData); } promise.then(() => { alert('টেমপ্লেট সফলভাবে সেভ হয়েছে!'); }).catch(err => { alert('তথ্য সেভ করতে সমস্যা হয়েছে: ' + err.message); btn.disabled = false; }); }
+        async function sendDueReminderSms(customerId) { const gatewayUrl = db.shopInfo.smsGatewayUrl; if (!gatewayUrl) { alert('অনুগ্রহ করে সেটিংস পেজ থেকে SMS গেটওয়ে URL সেট করুন।'); return; } if (db.templates.length === 0) { alert('অনুগ্রহ করে প্রথমে একটি SMS টেমপ্লেট তৈরি করুন।'); return; } const customer = db.customers.find(c => c.id === customerId); if (!customer || !customer.mobile) { alert('এই কাস্টমারের মোবাইল নম্বর পাওয়া যায়নি।'); return; } const totalDue = db.sales.filter(s => s.isPaymentRecord && s.customer === customer.name).reduce((sum, s) => sum + s.due, 0); if (totalDue <= 0) { alert('এই কাস্টমারের কোনো বকেয়া নেই।'); return; } let messageBody = db.templates[0].body; messageBody = messageBody.replace(/{customer_name}/g, customer.name); messageBody = messageBody.replace(/{due_amount}/g, totalDue.toFixed(2)); let phoneNumber = customer.mobile.replace(/[\s+-]/g, ''); if (phoneNumber.length === 11 && phoneNumber.startsWith('01')) phoneNumber = '+88' + phoneNumber; if (confirm(`আপনি কি "${customer.name}"-কে এই মেসেজটি পাঠাতে চান?\n\n"${messageBody}"`)) { try { const response = await fetch(`${gatewayUrl}/api/v1/sms/send`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: phoneNumber, message: messageBody }) }); const result = await response.json(); if (response.ok && result.success) { alert('SMS সফলভাবে পাঠানোর জন্য আপনার ফোনে পাঠানো হয়েছে!'); } else { throw new Error(result.message || 'SMS পাঠানো সম্ভব হয়নি।'); } } catch (error) { console.error('SMS পাঠানোর সময় ত্রুটি:', error); alert(`SMS পাঠাতে সমস্যা হয়েছে। \n\nError: ${error.message}`); } } }
         window.filterTable = (tableId, columnIndex) => { const inputId = tableId.replace('-table', '-search-input'); const input = document.getElementById(inputId); const filter = input.value.toUpperCase(); const table = document.getElementById(tableId); const tr = table.getElementsByTagName('tr'); for (let i = 1; i < tr.length; i++) { let td = tr[i].getElementsByTagName('td')[columnIndex]; if (td) { if (td.textContent.toUpperCase().indexOf(filter) > -1) { tr[i].style.display = ""; } else { tr[i].style.display = "none"; } } } };
 
-        // Start the application
         init();
     });
     </script>
